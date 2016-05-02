@@ -26,6 +26,9 @@ filetype on
 filetype plugin on
 filetype indent on
 set omnifunc=syntaxcomplete#Complete
+
+au BufNewFile,BufRead *.sls set filetype=yaml
+
 "Cuz pathogen
 execute pathogen#infect()
 
