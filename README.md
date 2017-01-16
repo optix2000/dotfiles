@@ -1,3 +1,3 @@
 # Dotfiles and stuff
 ## Install
-    curl -L https://raw.githubusercontent.com/optix2000/dotfiles/master/setup.sh | bash
+    curl -L https://github.com/optix2000/dotfiles/raw/master/setup.sh | bash
