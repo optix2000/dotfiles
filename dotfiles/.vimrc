@@ -1,3 +1,6 @@
+"Cuz pathogen
+execute pathogen#infect()
+
 "Cuz vi sucks
 set nocompatible
 "Cuz vim doesn't like zsh
@@ -27,10 +30,13 @@ filetype plugin on
 filetype indent on
 set omnifunc=syntaxcomplete#Complete
 
-au BufNewFile,BufRead *.sls set filetype=yaml
-
-"Cuz pathogen
-execute pathogen#infect()
-
 "Cuz forgetting sudo sucks
 cmap w!! w !sudo tee > /dev/null %
+
+"Cuz default buffer size is too small
+set viminfo='20,<1000
+
+"Cuz Salt SLS files are yaml files
+au BufNewFile,BufRead *.sls set filetype=yaml
+"Cuz built in python highlighting is pretty good
+let python_highlight_all = 1
