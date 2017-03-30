@@ -3,6 +3,8 @@ execute pathogen#infect()
 
 "Cuz vi sucks
 set nocompatible
+"Cuz sometimes the default backspace sux
+set backspace=2
 "Cuz vim doesn't like zsh
 set shell=bash
 "Cuz colors
