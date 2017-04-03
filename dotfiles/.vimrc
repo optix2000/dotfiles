@@ -26,6 +26,8 @@ set splitright
 set splitbelow
 "Cuz it sux cycling through all results
 set hlsearch
+"Cuz wanna know line numbers
+set ruler
 "Cuz autoeverything
 filetype on
 filetype plugin on
