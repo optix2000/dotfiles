@@ -32,6 +32,11 @@ set ruler
 filetype on
 filetype plugin on
 filetype indent on
+"Cuz remembering last line you were on
+if has("autocmd")
+  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
+"Cuz syntax completion
 set omnifunc=syntaxcomplete#Complete
 
 "Cuz forgetting sudo sucks
@@ -40,7 +45,8 @@ cmap w!! w !sudo tee > /dev/null %
 "Cuz default buffer size is too small
 set viminfo='20,<1000
 
-"Cuz Salt SLS files are yaml files
+"Cuz default detection is not enough
 au BufNewFile,BufRead *.sls set filetype=yaml
+au BufNewFile,BufRead Jenkinsfile setf groovy
 "Cuz built in python highlighting is pretty good
 let python_highlight_all = 1
