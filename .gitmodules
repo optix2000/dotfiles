@@ -5,3 +5,6 @@
 [submodule "dotfiles/.vim/bundle/vim-chef"]
 	path = dotfiles/.vim/bundle/vim-chef
 	url = https://github.com/dougireton/vim-chef.git
+[submodule "dotfiles/.vim/bundle/vim-json"]
+	path = dotfiles/.vim/bundle/vim-json
+	url = https://github.com/elzr/vim-json.git
