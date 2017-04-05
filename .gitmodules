@@ -2,3 +2,6 @@
 	path = dotfiles/.vim/bundle/syntastic
 	url = https://github.com/scrooloose/syntastic.git
 	branch = master
+[submodule "dotfiles/.vim/bundle/vim-chef"]
+	path = dotfiles/.vim/bundle/vim-chef
+	url = https://github.com/dougireton/vim-chef.git
