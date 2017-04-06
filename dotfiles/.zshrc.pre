@@ -9,7 +9,6 @@ antigen bundle terraform
 antigen bundle bundler
 antigen bundle knife
 antigen bundle kitchen
-antigen bundle rake
 antigen bundle gem
 antigen bundle golang
 
