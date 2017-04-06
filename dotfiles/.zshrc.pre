@@ -1,0 +1,17 @@
+GRML_DISPLAY_BATTERY=1
+REPORTTIME=1
+
+# Load antigen
+source ~/.zsh/antigen/antigen.zsh
+
+# Antigen plugins
+antigen bundle robbyrussell/oh-my-zsh plugins/terraform
+antigen bundle robbyrussell/oh-my-zsh plugins/bundler
+antigen bundle robbyrussell/oh-my-zsh plugins/knife
+antigen bundle robbyrussell/oh-my-zsh plugins/kitchen
+antigen bundle robbyrussell/oh-my-zsh plugins/rake
+antigen bundle robbyrussell/oh-my-zsh plugins/gem
+antigen bundle robbyrussell/oh-my-zsh plugins/golang
+
+# Apply plugins
+antigen apply
