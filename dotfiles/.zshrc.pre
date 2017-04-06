@@ -5,13 +5,13 @@ REPORTTIME=1
 source ~/.zsh/antigen/antigen.zsh
 
 # Antigen plugins
-antigen bundle robbyrussell/oh-my-zsh plugins/terraform
-antigen bundle robbyrussell/oh-my-zsh plugins/bundler
-antigen bundle robbyrussell/oh-my-zsh plugins/knife
-antigen bundle robbyrussell/oh-my-zsh plugins/kitchen
-antigen bundle robbyrussell/oh-my-zsh plugins/rake
-antigen bundle robbyrussell/oh-my-zsh plugins/gem
-antigen bundle robbyrussell/oh-my-zsh plugins/golang
+antigen bundle terraform
+antigen bundle bundler
+antigen bundle knife
+antigen bundle kitchen
+antigen bundle rake
+antigen bundle gem
+antigen bundle golang
 
 # Apply plugins
 antigen apply
