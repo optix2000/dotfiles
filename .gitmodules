@@ -8,3 +8,6 @@
 [submodule "dotfiles/.vim/bundle/vim-json"]
 	path = dotfiles/.vim/bundle/vim-json
 	url = https://github.com/elzr/vim-json.git
+[submodule "dotfiles/.zsh/antigen"]
+	path = dotfiles/.zsh/antigen
+	url = https://github.com/zsh-users/antigen.git
