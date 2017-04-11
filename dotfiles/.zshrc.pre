@@ -11,6 +11,7 @@ antigen bundle knife
 antigen bundle kitchen
 antigen bundle gem
 antigen bundle golang
+antigen bundle rvm
 
 # Apply plugins
 antigen apply
