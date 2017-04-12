@@ -12,6 +12,7 @@ antigen bundle kitchen
 antigen bundle gem
 antigen bundle golang
 antigen bundle rvm
+antigen bundle heroku
 
 # Apply plugins
 antigen apply
