@@ -10,7 +10,7 @@ git clone --depth 1 --recursive $GITURL $DOTDIR
 cd $DOTDIR
 # Glob dotfiles
 shopt -s dotglob nullglob
-rsync -rvvbc $DOTSUBDIR/* ~/
+rsync -rvvbcl $DOTSUBDIR/* ~/
 # Init pathogen
 mkdir -p ~/.vim/autoload ~/.vim/bundle
 curl -LSso ~/.vim/autoload/pathogen.vim https://github.com/tpope/vim-pathogen/raw/master/autoload/pathogen.vim
