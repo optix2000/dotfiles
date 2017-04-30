@@ -11,3 +11,6 @@
 [submodule "dotfiles/.zsh/antigen"]
 	path = dotfiles/.zsh/antigen
 	url = https://github.com/zsh-users/antigen.git
+[submodule "dotfiles/.vim/bundle/vim-better-whitespace"]
+	path = dotfiles/.vim/bundle/vim-better-whitespace
+	url = https://github.com/ntpeters/vim-better-whitespace.git
