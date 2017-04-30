@@ -8,9 +8,11 @@ fi
 cd $TMPDIR
 git clone --recursive $GITURL $DOTDIR
 cd $DOTDIR
-ls -l $DOTSUBDIR
+# Glob dotfiles
 shopt -s dotglob nullglob
 rsync -rvvbc $DOTSUBDIR/* ~/
+# Init pathogen
 mkdir -p ~/.vim/autoload ~/.vim/bundle
 curl -LSso ~/.vim/autoload/pathogen.vim https://github.com/tpope/vim-pathogen/raw/master/autoload/pathogen.vim
+
 rm -rf $TMPDIR
