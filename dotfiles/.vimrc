@@ -48,3 +48,10 @@ au BufNewFile,BufRead *.sls set filetype=yaml
 au BufNewFile,BufRead Jenkinsfile setf groovy
 "Cuz built in python highlighting is pretty good
 let python_highlight_all = 1
+
+
+" Source local vimrc
+let $LOCAL_VIMRC = '~/.vimrc.local'
+if filereadable($LOCAL_VIMRC)
+    source $LOCAL_VIMRC
+endif
