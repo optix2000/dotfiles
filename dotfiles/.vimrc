@@ -7,8 +7,6 @@ set nocompatible
 set backspace=2
 "Cuz vim doesn't like zsh
 set shell=bash
-"Cuz colors
-set t_Co=256
 "Cuz syntax highlighting
 syntax on
 "Cuz non-retarded tabs
