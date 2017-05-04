@@ -1,3 +1,5 @@
+#!/bin/bash
+# USAGE: curl -L https://github.com/optix2000/dotfiles/raw/master/setup.sh | bash
 GITURL='https://github.com/optix2000/dotfiles.git'
 DOTDIR='dotfiles'
 DOTSUBDIR='dotfiles'
