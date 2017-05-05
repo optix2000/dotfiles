@@ -8,7 +8,7 @@ if [ -z "$TMPDIR" ]; then
     exit 1
 fi
 cd $TMPDIR
-git clone --depth 1 --recursive --shallow-submodules $GITURL $DOTDIR
+git clone --depth 1 --recursive $GITURL $DOTDIR
 cd $DOTDIR
 # Glob dotfiles
 shopt -s dotglob nullglob
