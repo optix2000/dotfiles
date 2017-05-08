@@ -1,11 +1,20 @@
 #!/bin/bash
 # Quick installer for dotfiles
 # USAGE: curl -L https://github.com/optix2000/dotfiles/raw/master/setup.sh | bash
-set -e
 GITURL='https://github.com/optix2000/dotfiles.git'
 DOTDIR='dotfiles'
 DOTSUBDIR='dotfiles'
 TMPDIR=`mktemp -d`
+
+function cleanup() {
+  if [ ! -z "$TMPDIR" ]; then
+    echo 'Cleaning up tmpdir'
+    rm -rf $TMPDIR
+  fi
+}
+
+trap cleanup EXIT
+
 if [ -z "$TMPDIR" ]; then
     exit 1
 fi
