@@ -14,3 +14,6 @@
 [submodule "dotfiles/.vim/bundle/vim-better-whitespace"]
 	path = dotfiles/.vim/bundle/vim-better-whitespace
 	url = https://github.com/ntpeters/vim-better-whitespace.git
+[submodule "dotfiles/.vim/bundle/vim-go"]
+	path = dotfiles/.vim/bundle/vim-go
+	url = https://github.com/fatih/vim-go.git
