@@ -13,7 +13,7 @@ function cleanup() {
   fi
 }
 
-trap cleanup EXIT
+trap cleanup EXIT ERR
 
 if [ -z "$TMPDIR" ]; then
     exit 1
