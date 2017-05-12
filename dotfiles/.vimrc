@@ -24,6 +24,7 @@ set splitright
 set splitbelow
 "Cuz it sux cycling through all results
 set hlsearch
+set incsearch
 "Cuz wanna know line numbers
 set ruler
 "Cuz autoeverything
@@ -34,6 +35,14 @@ filetype indent on
 if has("autocmd")
   au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 endif
+
+"Cuz losing undo after closing sux
+try
+    set undodir=~/.vim/undodir/
+    set undofile
+catch
+endtry
+
 "Cuz syntax completion
 set omnifunc=syntaxcomplete#Complete
 
@@ -48,6 +57,8 @@ au BufNewFile,BufRead *.sls set filetype=yaml
 au BufNewFile,BufRead Jenkinsfile setf groovy
 "Cuz built in python highlighting is pretty good
 let python_highlight_all = 1
+
+let g:syntastic_go_checkers = ['go']
 
 
 " Source local vimrc
