@@ -43,9 +43,6 @@ try
 catch
 endtry
 
-"Cuz syntax completion
-set omnifunc=syntaxcomplete#Complete
-
 "Cuz forgetting sudo sucks
 cmap w!! w !sudo tee > /dev/null %
 
