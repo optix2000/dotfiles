@@ -31,6 +31,8 @@ set hlsearch
 set incsearch
 "Cuz wanna know line numbers
 set ruler
+"Cuz wanna always see status
+set laststatus=2
 "Cuz default buffer size is too small
 set viminfo='20,<1000
 
