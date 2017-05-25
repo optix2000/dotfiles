@@ -33,7 +33,7 @@ fi
 shopt -s dotglob nullglob
 rsync -rvvbcl $DOTSUBDIR/* ~/
 # Init pathogen
-mkdir -p ~/.vim/autoload ~/.vim/bundle
+mkdir -p ~/.vim/autoload ~/.vim/bundle ~/.vim/undodir
 curl -LSso ~/.vim/autoload/pathogen.vim https://github.com/tpope/vim-pathogen/raw/master/autoload/pathogen.vim
 
 rm -rf $TMPDIR
