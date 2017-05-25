@@ -38,7 +38,18 @@ set viminfo='20,<1000
 " Vim Extras
 " ---------------
 "Cuz forgetting sudo sucks
-cmap w!! w !sudo tee > /dev/null %
+function WriteWithSudo()
+  silent execute 'w !sudo tee > /dev/null %'
+  if v:shell_error == 0
+    silent execute 'e!'
+    redraw | echomsg @% 'written as root'
+  else
+    redraw | echohl ErrorMsg | echo @% 'failed to write as root' | echohl None
+  endif
+endfunction
+
+command W call WriteWithSudo
+cmap w!! W
 
 "Cuz remembering last line you were on
 if has("autocmd")
