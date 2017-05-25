@@ -59,8 +59,19 @@ filetype indent on
 "Cuz default detection is not enough
 au BufNewFile,BufRead *.sls set filetype=yaml
 au BufNewFile,BufRead Jenkinsfile setf groovy
+
+" --------------
+" Language specific configs
+" --------------
+" Python
 "Cuz built in python highlighting is pretty good
 let python_highlight_all = 1
+
+" Golang
+"Cuz we want highlighting
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_structs = 1
 
 
 " ---------------
