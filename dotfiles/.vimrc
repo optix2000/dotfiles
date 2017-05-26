@@ -50,7 +50,7 @@ function WriteWithSudo()
   endif
 endfunction
 
-command W call WriteWithSudo
+command W call WriteWithSudo()
 cmap w!! W
 
 "Cuz remembering last line you were on
