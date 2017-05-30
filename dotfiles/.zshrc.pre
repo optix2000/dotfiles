@@ -13,6 +13,7 @@ antigen bundle gem
 antigen bundle golang
 antigen bundle rvm
 antigen bundle heroku
+antigen bundle docker
 
 # Apply plugins
 antigen apply
