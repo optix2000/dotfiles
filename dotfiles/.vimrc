@@ -46,7 +46,7 @@ function WriteWithSudo()
     silent execute 'e!'
     redraw | echomsg @% 'written as root'
   else
-    redraw | echohl ErrorMsg | echo @% 'failed to write as root' | echohl None
+    redraw | echohl ErrorMsg | echomsg @% 'failed to write as root' | echohl None
   endif
 endfunction
 
