@@ -224,4 +224,8 @@ hex() {
 #hew() { perl -le 'print unpack "H*","'$1'"' }
 #weh() { perl -le 'print pack "H*","'$1'"' }
 
+if [ -f ~/.zshrc.local.local ]; then
+  source ~/.zshrc.local.local
+fi
+
 ## END OF FILE #################################################################

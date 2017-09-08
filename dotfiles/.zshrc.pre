@@ -16,3 +16,7 @@ antigen bundle docker
 
 # Apply plugins
 antigen apply
+
+if [ -f ~/.zshrc.pre.local ]; then
+  source ~/.zshrc.pre.local
+fi
