@@ -31,6 +31,18 @@ set laststatus=2
 "Cuz default buffer size is too small
 set viminfo='20,<1000
 
+"Cuz we don't care about file browser banners
+let g:netrw_banner = 0
+"Cuz tree browser es best
+let g:netrw_liststyle = 3
+"Cuz we don't want 50% file browser
+let g:netrw_winsize = 25
+"Open file on current right pane
+let g:netrw_browse_split = 4
+"Move cursor to new split (not required due to logical splits above)
+let g:netrw_altv = 1
+
+
 " ---------------
 " Vim Extras
 " ---------------
@@ -72,6 +84,7 @@ Plug 'w0rp/ale'
 Plug 'vim-ruby/vim-ruby'
 Plug 'davidhalter/jedi-vim'
 Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
+Plug 'Shougo/neocomplete'
 
 call plug#end()
 
@@ -83,6 +96,13 @@ syntax on
 filetype on
 filetype plugin on
 filetype indent on
+"Enable neocomplete
+let g:neocomplete#enable_at_startup = 1
+"Enable ruby autocompletetion, with only omni (neo omni is broken)
+if !exists('g:neocomplete#force_omni_input_patterns')
+  let g:neocomplete#force_omni_input_patterns = {}
+endif
+let g:neocomplete#force_omni_input_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
 
 "Cuz default detection is not enough
 au BufNewFile,BufRead *.sls set filetype=yaml
