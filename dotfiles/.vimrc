@@ -1,6 +1,3 @@
-"Cuz pathogen
-execute pathogen#infect()
-
 " ----------------
 "  Standard vim configs
 " ----------------
@@ -11,8 +8,6 @@ set nocompatible
 set backspace=2
 "Cuz vim doesn't like zsh
 set shell=bash
-"Cuz syntax highlighting
-syntax on
 "Cuz non-retarded tabs
 set smarttab
 set expandtab
@@ -64,7 +59,27 @@ try
 catch
 endtry
 
-"Cuz autoeverything
+" ----------
+" Plugins
+"-----------
+call plug#begin()
+
+Plug 'dougireton/vim-chef'
+Plug 'elzr/vim-json'
+Plug 'ntpeters/vim-better-whitespace'
+Plug 'fatih/vim-go'
+Plug 'w0rp/ale'
+Plug 'vim-ruby/vim-ruby'
+Plug 'davidhalter/jedi-vim'
+Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
+
+call plug#end()
+
+" ------------
+" Language configs
+" ------------
+"Cuz syntax highlighting and auto code
+syntax on
 filetype on
 filetype plugin on
 filetype indent on
