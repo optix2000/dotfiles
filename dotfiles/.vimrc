@@ -79,11 +79,11 @@ call plug#begin()
 Plug 'dougireton/vim-chef'
 Plug 'elzr/vim-json'
 Plug 'ntpeters/vim-better-whitespace'
-Plug 'fatih/vim-go'
 Plug 'w0rp/ale'
 Plug 'vim-ruby/vim-ruby'
 Plug 'davidhalter/jedi-vim'
 Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
+Plug 'fatih/vim-go'
 Plug 'Shougo/neocomplete'
 
 call plug#end()
@@ -103,6 +103,11 @@ if !exists('g:neocomplete#force_omni_input_patterns')
   let g:neocomplete#force_omni_input_patterns = {}
 endif
 let g:neocomplete#force_omni_input_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
+"Enable golang autocompletion
+if !exists('g:neocomplete#sources#omni#input_patterns')
+  let g:neocomplete#sources#omni#input_patterns = {}
+endif
+let g:neocomplete#sources#omni#input_patterns.go = '[^.[:digit:] *\t]\.\w*'
 
 "Cuz default detection is not enough
 au BufNewFile,BufRead *.sls set filetype=yaml
