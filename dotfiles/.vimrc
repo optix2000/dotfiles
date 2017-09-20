@@ -30,6 +30,8 @@ set ruler
 set laststatus=2
 "Cuz default buffer size is too small
 set viminfo='20,<1000
+"Cuz default pattern memory limit is too small
+set maxmempattern=100000
 
 "Cuz we don't care about file browser banners
 let g:netrw_banner = 0
