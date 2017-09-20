@@ -66,7 +66,7 @@ zstyle ':prompt:grml:left:setup' items rc virtual-env change-root user at host p
 #WORDCHARS=.
 #WORDCHARS='*?_[]~=&;!#$%^(){}'
 #WORDCHARS='${WORDCHARS:s@/@}'
-WORDCHARS='*?_-.[]~=&;!#$%^(){}<>' # TODO: Can't figure out how to just subtract / from WORDCHARS as the above doesn't seem to work
+WORDCHARS='*?_-[]~=&;!#$%^(){}<>' # TODO: Can't figure out how to just subtract / from WORDCHARS as the above doesn't seem to work
 
 ## warning if file exists ('cat /dev/null > ~/.zshrc')
 setopt NO_clobber
