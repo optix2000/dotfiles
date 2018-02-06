@@ -86,6 +86,7 @@ Plug 'vim-ruby/vim-ruby'
 Plug 'davidhalter/jedi-vim'
 Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
 Plug 'fatih/vim-go'
+Plug 'lepture/vim-jinja'
 Plug 'Shougo/neocomplete'
 
 call plug#end()
