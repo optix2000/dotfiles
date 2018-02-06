@@ -111,6 +111,9 @@ if !exists('g:neocomplete#sources#omni#input_patterns')
 endif
 let g:neocomplete#sources#omni#input_patterns.go = '[^.[:digit:] *\t]\.\w*'
 
+"Map tab to completion for tab completion
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+
 "Cuz default detection is not enough
 au BufNewFile,BufRead *.sls set filetype=yaml
 au BufNewFile,BufRead Jenkinsfile setf groovy
