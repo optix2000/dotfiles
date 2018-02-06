@@ -36,5 +36,5 @@ rsync -rvvbcl $DOTSUBDIR/* ~/
 mkdir -p ~/.vim/autoload ~/.vim/undodir
 # Install and init Plug
 curl -Lo ~/.vim/autoload/plug.vim https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-vim +PlugInstall +qall
+vim +PlugUpdate +qall
 reset
