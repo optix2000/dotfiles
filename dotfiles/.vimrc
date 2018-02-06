@@ -139,6 +139,11 @@ let g:go_highlight_structs = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_go_checkers = ['go']
 
+" ---------------
+"  Ale Configs
+" ---------------
+let g:ale_linters = { 'go': ['go build', 'gofmt', 'golint', 'go vet'] }
+
 " Source local vimrc
 let $LOCAL_VIMRC = '~/.vimrc.local'
 if filereadable($LOCAL_VIMRC)
