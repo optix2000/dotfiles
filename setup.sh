@@ -11,6 +11,7 @@ function cleanup() {
     echo 'Cleaning up tmpdir'
     rm -rf $TMPDIR
   fi
+  exit 2
 }
 
 trap cleanup EXIT ERR
