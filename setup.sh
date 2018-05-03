@@ -7,11 +7,12 @@ DOTSUBDIR='dotfiles'
 TMPDIR=`mktemp -d`
 
 function cleanup() {
+  rc=$?
   if [ ! -z "$TMPDIR" ]; then
     echo 'Cleaning up tmpdir'
     rm -rf $TMPDIR
   fi
-  exit 2
+  exit $rc
 }
 
 trap cleanup EXIT ERR
