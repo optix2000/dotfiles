@@ -32,6 +32,8 @@ set laststatus=2
 set viminfo='20,<1000
 "Cuz default pattern memory limit is too small
 set maxmempattern=100000
+"Cuz we want faster responses (100ms)
+set updatetime=100
 
 "Cuz we don't care about file browser banners
 let g:netrw_banner = 0
@@ -88,6 +90,9 @@ Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' 
 Plug 'fatih/vim-go'
 Plug 'lepture/vim-jinja'
 Plug 'Shougo/neocomplete'
+Plug 'itchyny/lightline.vim'
+Plug 'maximbaz/lightline-ale'
+Plug 'airblade/vim-gitgutter'
 
 call plug#end()
 
