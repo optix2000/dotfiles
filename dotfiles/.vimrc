@@ -141,12 +141,6 @@ let g:go_highlight_types = 1
 let g:go_highlight_extra_types = 1
 
 " ---------------
-" Syntastic Configs
-" ---------------
-let g:syntastic_check_on_open = 1
-let g:syntastic_go_checkers = ['go']
-
-" ---------------
 "  Ale Configs
 " ---------------
 let g:ale_linters = { 'go': ['go build', 'gofmt', 'golint', 'go vet'] }
