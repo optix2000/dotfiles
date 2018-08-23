@@ -3,7 +3,7 @@ REPORTTIME=1
 
 # Set ZSH_CACHE_DIR for some oh-my-zsh plugins
 if [[ -z "$ZSH_CACHE_DIR" ]]; then
-  ZSH_CACHE_DIR="$ZSH/cache"
+  ZSH_CACHE_DIR="$HOME/.zsh/cache"
 fi
 
 # Load antigen

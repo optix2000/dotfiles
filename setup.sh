@@ -34,6 +34,8 @@ fi
 # Glob dotfiles
 shopt -s dotglob nullglob
 rsync -rvvbcl $DOTSUBDIR/* ~/
+# Make zsh cache dir
+mkdir -p ~/.zsh/cache
 # Make vim dirs
 mkdir -p ~/.vim/autoload ~/.vim/undodir
 chmod 750 ~/.vim/autoload
