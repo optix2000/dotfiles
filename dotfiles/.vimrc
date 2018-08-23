@@ -139,6 +139,8 @@ let g:go_highlight_structs = 1
 let g:go_highlight_fields = 1
 let g:go_highlight_types = 1
 let g:go_highlight_extra_types = 1
+" We're ok with degraded functionality on older vims
+let g:go_version_warning = 0
 
 " ---------------
 "  Ale Configs
