@@ -27,7 +27,7 @@ cd $DOTDIR
 
 # Patch zshrc on macOS 16 (Sierra)
 if [[ "$OSTYPE" == "darwin16"* ]] || [[ "$OSTYPE" == "darwin17"* ]] ; then
-  patch $DOTDIR/.zshrc zshrc-macos-sierra-battery.patch
+  patch $DOTSUBDIR/.zshrc zshrc-macos-sierra-battery.patch
 fi
 
 
