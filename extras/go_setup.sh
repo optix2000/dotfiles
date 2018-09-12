@@ -10,3 +10,6 @@ if [[ -e "~/.zshrc.pre.common" ]]; then
 else
   cat $EXTRASDIR/go.zshrc > ~/.zshrc.pre.common
 fi
+mkdir -p ~/go
+# Fetch gocode
+zsh -c "go get -u github.com/mdempsky/gocode"
