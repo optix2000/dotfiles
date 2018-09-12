@@ -4,6 +4,7 @@
 GITURL='https://github.com/optix2000/dotfiles.git'
 DOTDIR='dotfiles'
 DOTSUBDIR='dotfiles'
+export EXTRASDIR='extras'
 TMPDIR=`mktemp -d`
 
 function cleanup() {
@@ -36,6 +37,11 @@ shopt -s dotglob nullglob
 rsync -rvvbcl $DOTSUBDIR/* ~/
 # Make zsh cache dir
 mkdir -p ~/.zsh/cache
+# Detect golang
+if go version; then
+  bash extras/go_setup.sh
+fi
+
 # Make vim dirs
 mkdir -p ~/.vim/autoload ~/.vim/undodir
 chmod 750 ~/.vim/autoload

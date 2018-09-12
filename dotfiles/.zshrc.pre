@@ -23,6 +23,12 @@ antigen bundle gnu-utils
 # Apply plugins
 antigen apply
 
+# Load common envs
+if [ -f ~/.zshrc.pre.common ]; then
+  source ~/.zshrc.pre.common
+fi
+
+# Load local envs
 if [ -f ~/.zshrc.pre.local ]; then
   source ~/.zshrc.pre.local
 fi
