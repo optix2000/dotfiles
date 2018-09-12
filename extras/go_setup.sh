@@ -12,4 +12,4 @@ else
 fi
 mkdir -p ~/go
 # Fetch gocode
-zsh -c "go get -u github.com/mdempsky/gocode"
+zsh --login -c "go get -u github.com/mdempsky/gocode"
