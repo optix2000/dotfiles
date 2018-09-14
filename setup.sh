@@ -5,7 +5,7 @@ GITURL='https://github.com/optix2000/dotfiles.git'
 DOTDIR='dotfiles'
 DOTSUBDIR='dotfiles'
 export EXTRASDIR='extras'
-TMPDIR=`mktemp -d`
+TMPDIR=`mktemp -d` || exit 1
 
 function cleanup() {
   rc=$?
@@ -17,10 +17,6 @@ function cleanup() {
 }
 
 trap cleanup EXIT ERR
-
-if [ -z "$TMPDIR" ]; then
-    exit 1
-fi
 
 cd $TMPDIR
 git clone --depth 1 --recursive $GITURL $DOTDIR
