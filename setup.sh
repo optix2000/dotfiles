@@ -22,7 +22,7 @@ cd $TMPDIR
 git clone --depth 1 --recursive $GITURL $DOTDIR
 cd $DOTDIR
 
-# Patch zshrc on macOS 16 (Sierra)
+# Patch broken zshrc battery meter on macOS 16+ (Sierra)
 if [[ "$OSTYPE" == "darwin16"* ]] || [[ "$OSTYPE" == "darwin17"* ]] ; then
   patch $DOTSUBDIR/.zshrc zshrc-macos-sierra-battery.patch
 fi
@@ -30,10 +30,11 @@ fi
 
 # Glob dotfiles
 shopt -s dotglob nullglob
-rsync -rvvbcl $DOTSUBDIR/* ~/
+# Use rsync to copy files and symlinks and make backups. cp is not the same on linux vs Macos
+rsync -rbcl $DOTSUBDIR/* ~/
 # Make zsh cache dir
 mkdir -p ~/.zsh/cache
-# Detect golang
+# Detect golang and do some go setup
 if go version; then
   bash extras/go_setup.sh
 fi
@@ -46,6 +47,7 @@ chmod 700 ~/.vim/undodir
 # spring cleaning
 find ~/.vim/undodir -maxdepth 1 -mindepth 1 -type f -mtime +365 -delete
 # Install and init Plug
-curl -Lo ~/.vim/autoload/plug.vim https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+curl -Lso ~/.vim/autoload/plug.vim https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 vim +PlugClean +PlugUpdate +qall
 reset
+echo "Done!"
