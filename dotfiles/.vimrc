@@ -87,7 +87,7 @@ Plug 'w0rp/ale'
 Plug 'vim-ruby/vim-ruby'
 Plug 'davidhalter/jedi-vim'
 Plug 'mdempsky/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
-Plug 'fatih/vim-go'
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'lepture/vim-jinja'
 Plug 'Shougo/neocomplete'
 Plug 'itchyny/lightline.vim'
