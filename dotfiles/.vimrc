@@ -93,6 +93,7 @@ Plug 'Shougo/neocomplete'
 Plug 'itchyny/lightline.vim'
 Plug 'maximbaz/lightline-ale'
 Plug 'airblade/vim-gitgutter'
+Plug 'terryma/vim-multiple-cursors'
 
 call plug#end()
 
