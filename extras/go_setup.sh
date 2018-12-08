@@ -11,5 +11,3 @@ else
   cat $EXTRASDIR/go.zshrc > ~/.zshrc.pre.common
 fi
 mkdir -p ~/go
-# Fetch gocode
-zsh --login -c "go get -u github.com/mdempsky/gocode"
