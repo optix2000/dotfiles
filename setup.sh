@@ -34,6 +34,8 @@ shopt -s dotglob nullglob
 rsync -rbcl $DOTSUBDIR/* ~/
 # Make zsh cache dir
 mkdir -p ~/.zsh/cache
+# Init and update antigen plugins
+zsh -c 'source ~/.zshrc; antigen update'
 # Detect golang and do some go setup
 if go version; then
   bash extras/go_setup.sh
