@@ -5,4 +5,4 @@ services:
 before_install:
   - docker build --pull --tag dotfiles/base .
 script:
-  - 'docker run --tty --volume `pwd`:/home/user/dotfiles dotfiles/base bash dotfiles/setup.sh'
+  - 'docker run --tty --volume `pwd`:/home/user/dotfiles dotfiles/base "cat dotfiles/setup.sh | bash"'
