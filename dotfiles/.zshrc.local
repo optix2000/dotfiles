@@ -224,6 +224,11 @@ hex() {
 #hew() { perl -le 'print unpack "H*","'$1'"' }
 #weh() { perl -le 'print pack "H*","'$1'"' }
 
+# Patch broken umask on WSL https://github.com/microsoft/WSL/issues/352
+if [[ -f /proc/version ]] && grep -q "Microsoft" /proc/version; then
+  [[ "$(umask)" == "000" ]] && umask 022
+fi
+
 if [ -f ~/.zshrc.local.local ]; then
   source ~/.zshrc.local.local
 fi

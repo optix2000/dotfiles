@@ -27,11 +27,13 @@ if [[ "$OSTYPE" == "darwin16"* ]] || [[ "$OSTYPE" == "darwin17"* ]] ; then
   patch $DOTSUBDIR/.zshrc zshrc-macos-sierra-battery.patch
 fi
 
-
 # Glob dotfiles
 shopt -s dotglob nullglob
 # Use rsync to copy files and symlinks and make backups. cp is not the same on linux vs Macos
 rsync -rbcl $DOTSUBDIR/* ~/
+# Touch local files
+touch ~/.zshrc.pre.local
+touch ~/.zshrc.local.local
 # Make zsh cache dir
 mkdir -p ~/.zsh/cache
 # Init and update antigen plugins
