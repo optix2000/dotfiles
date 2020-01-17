@@ -94,6 +94,7 @@ Plug 'itchyny/lightline.vim'
 Plug 'maximbaz/lightline-ale'
 Plug 'airblade/vim-gitgutter'
 Plug 'terryma/vim-multiple-cursors'
+Plug 'rhysd/vim-crystal'
 
 call plug#end()
 
