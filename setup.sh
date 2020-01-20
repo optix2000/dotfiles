@@ -23,7 +23,7 @@ git clone --depth 1 --recursive $GITURL $DOTDIR
 cd $DOTDIR
 
 # Patch broken zshrc battery meter on macOS 16+ (Sierra)
-if [[ "$OSTYPE" == "darwin16"* ]] || [[ "$OSTYPE" == "darwin17"* ]] || [[ "$OSTYPE" == "darwin18"* ]]; then
+if [[ "$OSTYPE" == "darwin16"* ]] || [[ "$OSTYPE" == "darwin17"* ]] || [[ "$OSTYPE" == "darwin18"* ]] || [[ "$OSTYPE" == "darwin19"* ]]; then
   patch $DOTSUBDIR/.zshrc zshrc-macos-sierra-battery.patch
 fi
 
