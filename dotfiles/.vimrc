@@ -86,7 +86,6 @@ Plug 'ntpeters/vim-better-whitespace'
 Plug 'w0rp/ale'
 Plug 'vim-ruby/vim-ruby'
 Plug 'davidhalter/jedi-vim'
-Plug 'mdempsky/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'lepture/vim-jinja'
 Plug 'Shougo/neocomplete'
@@ -106,25 +105,32 @@ syntax on
 filetype on
 filetype plugin on
 filetype indent on
-"Enable neocomplete
-let g:neocomplete#enable_at_startup = 1
-"Enable ruby autocompletetion, with only omni (neo omni is broken)
-if !exists('g:neocomplete#force_omni_input_patterns')
-  let g:neocomplete#force_omni_input_patterns = {}
-endif
-let g:neocomplete#force_omni_input_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
-"Enable golang autocompletion
-if !exists('g:neocomplete#sources#omni#input_patterns')
-  let g:neocomplete#sources#omni#input_patterns = {}
-endif
-let g:neocomplete#sources#omni#input_patterns.go = '[^.[:digit:] *\t]\.\w*'
-
-"Map tab to completion for tab completion
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 
 "Cuz default detection is not enough
 au BufNewFile,BufRead *.sls set filetype=yaml
 au BufNewFile,BufRead Jenkinsfile setf groovy
+" --------------
+" Neocomplete configs
+" --------------
+let g:neocomplete#enable_at_startup = 1
+
+"Enable heavy autocompletetion
+if !exists('g:neocomplete#omni_input_patterns')
+  let g:neocomplete#omni_input_patterns = {}
+endif
+let g:neocomplete#omni_input_patterns.python ='[^. \t]\.\w*'
+let g:neocomplete#omni_input_patterns.c ='[^.[:digit:] *\t]\%(\.\|->\)\w*'
+let g:neocomplete#omni_input_patterns.cpp ='[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*'
+
+
+" Ruby neocomplete is borked
+if !exists('g:neocomplete#force_omni_input_patterns')
+		  let g:neocomplete#force_omni_input_patterns = {}
+endif
+let g:neocomplete#force_omni_input_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
+
+"Map tab to completion for tab completion
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 
 " --------------
 " Language specific configs
@@ -143,6 +149,9 @@ let g:go_highlight_types = 1
 let g:go_highlight_extra_types = 1
 " We're ok with degraded functionality on older vims
 let g:go_version_warning = 0
+" gopls
+let g:go_def_mode='gopls'
+let g:go_info_mode='gopls'
 
 " ---------------
 "  Ale Configs
