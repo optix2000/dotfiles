@@ -18,6 +18,13 @@ function cleanup() {
 
 trap cleanup EXIT ERR
 
+# Magick antibody if it doesn't exist
+if ! command -v antibody > /dev/null; then
+  curl -Lsf https://raw.githubusercontent.com/getantibody/installer/master/install | sh -s - -b ~/.zsh
+else
+  ln -s `command -v` ~/.zsh/antibody
+fi
+
 cd $TMPDIR
 git clone --depth 1 --recursive $GITURL $DOTDIR
 cd $DOTDIR
@@ -36,8 +43,8 @@ touch ~/.zshrc.pre.local
 touch ~/.zshrc.local.local
 # Make zsh cache dir
 mkdir -p ~/.zsh/cache
-# Init and update antigen plugins
-zsh -c 'source ~/.zshrc; antigen update'
+# Init zsh
+zsh -c 'source ~/.zshrc'
 # Detect golang and do some go setup
 if go version; then
   bash extras/go_setup.sh
@@ -51,7 +58,7 @@ chmod 700 ~/.vim/undodir
 # spring cleaning
 find ~/.vim/undodir -maxdepth 1 -mindepth 1 -type f -mtime +365 -delete
 # Install and init Plug
-curl -Lso ~/.vim/autoload/plug.vim https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+curl -Lsfo ~/.vim/autoload/plug.vim https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 vim +PlugClean +PlugUpdate +qall
 reset
 echo "Done!"

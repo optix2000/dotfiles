@@ -1,0 +1,11 @@
+# Antibody plugins
+robbyrussell/oh-my-zsh path:plugins/terraform
+robbyrussell/oh-my-zsh path:plugins/bundler
+robbyrussell/oh-my-zsh path:plugins/knife
+robbyrussell/oh-my-zsh path:plugins/kitchen
+robbyrussell/oh-my-zsh path:plugins/gem
+robbyrussell/oh-my-zsh path:plugins/golang
+robbyrussell/oh-my-zsh path:plugins/heroku
+robbyrussell/oh-my-zsh path:plugins/docker
+robbyrussell/oh-my-zsh path:plugins/gnu-utils
+robbyrussell/oh-my-zsh path:plugins/kubectl
