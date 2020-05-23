@@ -34,6 +34,8 @@ set viminfo='20,<1000
 set maxmempattern=100000
 "Cuz we want faster responses (100ms)
 set updatetime=100
+"Cuz we a global clipboard (can copy paste with y/p)
+set clipboard=unnamed
 
 "Cuz we don't care about file browser banners
 let g:netrw_banner = 0
