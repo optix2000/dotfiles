@@ -90,7 +90,13 @@ Plug 'vim-ruby/vim-ruby'
 Plug 'davidhalter/jedi-vim'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'lepture/vim-jinja'
-Plug 'Shougo/neocomplete'
+if has('nvim')
+  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+  Plug 'Shougo/deoplete.nvim'
+  Plug 'roxma/nvim-yarp'
+  Plug 'roxma/vim-hug-neovim-rpc'
+endif
 Plug 'itchyny/lightline.vim'
 Plug 'maximbaz/lightline-ale'
 Plug 'airblade/vim-gitgutter'
@@ -114,22 +120,7 @@ au BufNewFile,BufRead Jenkinsfile setf groovy
 " --------------
 " Neocomplete configs
 " --------------
-let g:neocomplete#enable_at_startup = 1
-
-"Enable heavy autocompletetion
-if !exists('g:neocomplete#omni_input_patterns')
-  let g:neocomplete#omni_input_patterns = {}
-endif
-let g:neocomplete#omni_input_patterns.python ='[^. \t]\.\w*'
-let g:neocomplete#omni_input_patterns.c ='[^.[:digit:] *\t]\%(\.\|->\)\w*'
-let g:neocomplete#omni_input_patterns.cpp ='[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*'
-
-
-" Ruby neocomplete is borked
-if !exists('g:neocomplete#force_omni_input_patterns')
-		  let g:neocomplete#force_omni_input_patterns = {}
-endif
-let g:neocomplete#force_omni_input_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
+let g:deoplete#enable_at_startup = 1
 
 "Map tab to completion for tab completion
 inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
