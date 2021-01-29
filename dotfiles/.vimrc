@@ -82,26 +82,30 @@ endtry
 "-----------
 call plug#begin()
 
+" Languages
 Plug 'dougireton/vim-chef'
 Plug 'elzr/vim-json'
 Plug 'ntpeters/vim-better-whitespace'
-Plug 'w0rp/ale'
+Plug 'rhysd/vim-crystal'
 Plug 'vim-ruby/vim-ruby'
 Plug 'davidhalter/jedi-vim'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'lepture/vim-jinja'
+" Autocomplete
 if has('nvim')
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 else
   Plug 'Shougo/deoplete.nvim'
   Plug 'roxma/nvim-yarp'
-  Plug 'roxma/vim-hug-neovim-rpc'
+  Plug 'roxma/vim-hug-neovim-rpc', { 'do': 'pip3 install pynvim' }
 endif
+" Other integrations
+Plug 'w0rp/ale'
 Plug 'itchyny/lightline.vim'
 Plug 'maximbaz/lightline-ale'
 Plug 'airblade/vim-gitgutter'
+" Misc
 Plug 'terryma/vim-multiple-cursors'
-Plug 'rhysd/vim-crystal'
 
 call plug#end()
 
@@ -121,6 +125,17 @@ au BufNewFile,BufRead Jenkinsfile setf groovy
 " Neocomplete configs
 " --------------
 let g:deoplete#enable_at_startup = 1
+
+" https://github.com/fatih/vim-go/blob/3a8e3f6ded412b25fb3c13eecf76d5809fa175e8/doc/vim-go.txt#L147
+" python regex stolen from jedi-vim
+set completeopt+=noselect
+call deoplete#custom#var('omni', 'input_patterns', {
+      \  'go': '[^. *\t]\.\w*',
+      \  'c': '[^.[:digit:] *\t]\%(\.\|->\)\w*',
+      \  'cpp': '[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*',
+      \  'python': '[^. \t0-9]\.\w*$|^\s*@\w*$|^\s*from\s.+import \w*|^\s*from \w*|^\s*import \w*',
+      \  'ruby': ['[^. *\t]\.\w*', '[a-zA-Z_]\w*::'],
+      \})
 
 "Map tab to completion for tab completion
 inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
