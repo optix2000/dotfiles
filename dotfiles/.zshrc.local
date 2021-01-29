@@ -229,6 +229,9 @@ if [[ -f /proc/version ]] && grep -q "Microsoft" /proc/version; then
   [[ "$(umask)" == "000" ]] && umask 022
 fi
 
+# Moar hist
+SAVEHIST=10000000
+
 if [ -f ~/.zshrc.local.local ]; then
   source ~/.zshrc.local.local
 fi
