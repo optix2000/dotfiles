@@ -91,6 +91,7 @@ Plug 'vim-ruby/vim-ruby'
 Plug 'davidhalter/jedi-vim'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'lepture/vim-jinja'
+Plug 'hashivim/vim-terraform'
 " Autocomplete
 if has('nvim')
   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -106,6 +107,7 @@ Plug 'maximbaz/lightline-ale'
 Plug 'airblade/vim-gitgutter'
 " Misc
 Plug 'terryma/vim-multiple-cursors'
+Plug 'preservim/tagbar'
 
 call plug#end()
 
