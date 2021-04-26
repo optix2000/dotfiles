@@ -136,6 +136,8 @@ call deoplete#custom#var('omni', 'input_patterns', {
       \  'c': '[^.[:digit:] *\t]\%(\.\|->\)\w*',
       \  'cpp': '[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*',
       \  'python': '[^. \t0-9]\.\w*$|^\s*@\w*$|^\s*from\s.+import \w*|^\s*from \w*|^\s*import \w*',
+      \})
+call deoplete#custom#option('omni_patterns', {
       \  'ruby': ['[^. *\t]\.\w*', '[a-zA-Z_]\w*::'],
       \})
 
@@ -159,6 +161,11 @@ let g:go_highlight_types = 1
 let g:go_highlight_extra_types = 1
 " We're ok with degraded functionality on older vims
 let g:go_version_warning = 0
+
+" Ruby
+" Actually enable autocomplete
+let g:rubycomplete_buffer_loading = 1
+let g:rubycomplete_classes_in_global = 1
 
 " ---------------
 "  Ale Configs
