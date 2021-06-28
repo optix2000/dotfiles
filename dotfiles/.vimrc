@@ -36,6 +36,11 @@ set maxmempattern=100000
 set updatetime=100
 "Cuz we a global clipboard (can copy paste with y/p)
 set clipboard=unnamed
+" Neovim workarounds
+if has('nvim')
+  " Replicate find/replace incremental search
+  set inccommand=nosplit
+endif
 
 "Cuz we don't care about file browser banners
 let g:netrw_banner = 0
