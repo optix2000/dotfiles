@@ -7,7 +7,7 @@ if [[ -z "$ZSH_CACHE_DIR" ]]; then
 fi
 
 # Load antibody
-source <(~/.zsh/antibody init)
+source <(antibody init)
 
 # Set OMZ variables manually
 ANTIBODY_HOME="$(antibody home)"
