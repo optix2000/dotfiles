@@ -1,6 +1,11 @@
 GRML_DISPLAY_BATTERY=1
 REPORTTIME=1
 
+# Load common envs
+if [ -f ~/.zshrc.pre.common ]; then
+  source ~/.zshrc.pre.common
+fi
+
 # Set ZSH_CACHE_DIR for some oh-my-zsh plugins
 if [[ -z "$ZSH_CACHE_DIR" ]]; then
   ZSH_CACHE_DIR="$HOME/.zsh/cache"
@@ -16,11 +21,6 @@ DISABLE_AUTO_UPDATE="true"
 
 # Load plugins
 antibody bundle < ~/.zsh/plugins
-
-# Load common envs
-if [ -f ~/.zshrc.pre.common ]; then
-  source ~/.zshrc.pre.common
-fi
 
 # Load local envs
 if [ -f ~/.zshrc.pre.local ]; then
