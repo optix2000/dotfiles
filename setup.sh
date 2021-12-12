@@ -18,12 +18,11 @@ function cleanup() {
 
 trap cleanup EXIT ERR
 
-# Magick antibody if it doesn't exist
-if ! command -v antibody > /dev/null; then
-  curl -Lsf https://raw.githubusercontent.com/getantibody/installer/master/install | sh -s - -b ~/.zsh
+# Install zsh-snap
+if ! command -v znap && ! [ -d ~/.zsh/zsh-snap]; then
+    git clone --depth 1 -- https://github.com/marlonrichert/zsh-snap.git ~/.zsh/zsh-snap
 else
-  ln -s `command -v` ~/.zsh/antibody
-fi
+
 
 cd $TMPDIR
 git clone --depth 1 --recursive $GITURL $DOTDIR
@@ -45,6 +44,7 @@ touch ~/.zshrc.local.local
 mkdir -p ~/.zsh/cache
 # Init zsh
 zsh -c 'source ~/.zshrc'
+
 # Detect golang and do some go setup
 if go version; then
   bash extras/go_setup.sh
