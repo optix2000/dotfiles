@@ -19,9 +19,9 @@ function cleanup() {
 trap cleanup EXIT ERR
 
 # Install zsh-snap
-if ! command -v znap && ! [ -d ~/.zsh/zsh-snap]; then
+if ! command -v znap && ! [ -d ~/.zsh/zsh-snap ]; then
     git clone --depth 1 -- https://github.com/marlonrichert/zsh-snap.git ~/.zsh/zsh-snap
-else
+fi
 
 
 cd $TMPDIR
