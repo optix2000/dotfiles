@@ -16,4 +16,6 @@ znap source ohmyzsh/ohmyzsh plugins/heroku
 znap source ohmyzsh/ohmyzsh plugins/gnu-utils
 #znap source ohmyzsh/ohmyzsh plugins/ripgrep
 
-znap fpath _kubectl 'kubectl completion zsh'
+if command -v kubectl &>/dev/null; then
+  znap fpath _kubectl 'kubectl completion zsh'
+fi
