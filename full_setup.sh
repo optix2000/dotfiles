@@ -6,7 +6,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   brew install curl rsync git zsh vim python
 elif [[ -f "/etc/debian_version" ]]; then
   sudo apt-get update
-  sudo apt-get install -y curl rsync git zsh nvim
+  sudo apt-get install -y curl rsync git zsh neovim
 fi
 
 curl -sfL https://github.com/optix2000/dotfiles/raw/master/setup.sh | bash
