@@ -21,4 +21,4 @@ chmod 700 ~/.vim/undodir
 find ~/.vim/undodir -maxdepth 1 -mindepth 1 -type f -mtime +365 -delete
 # Install and init Plug
 curl -Lsfo ~/.vim/autoload/plug.vim https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-nvim +PlugClean! +PlugUpdate +qall
+nvim +PlugClean! "+PlugUpdate --sync" +qall
