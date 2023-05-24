@@ -10,6 +10,7 @@ if command -v nvim > /dev/null; then
     fi
   fi
   alias vim=nvim
+  pip3 install neovim
 fi
 
 # Make vim dirs

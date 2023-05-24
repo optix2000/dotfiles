@@ -7,7 +7,7 @@ source ~/.zsh/zsh-snap/znap.zsh
 
 # Install base zshrc
 znap clone grml/grml-etc-core
-source ~/.zsh/grml-etc-core/etc/zsh/zshrc
+source ~/.zsh/grml/grml-etc-core/etc/zsh/zshrc
 
 znap source ohmyzsh/ohmyzsh plugins/terraform
 znap source ohmyzsh/ohmyzsh plugins/gem
