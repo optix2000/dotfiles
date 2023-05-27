@@ -14,6 +14,7 @@ znap source ohmyzsh/ohmyzsh plugins/gem
 znap source ohmyzsh/ohmyzsh plugins/golang
 znap source ohmyzsh/ohmyzsh plugins/heroku
 znap source ohmyzsh/ohmyzsh plugins/gnu-utils
+znap source ohmyzsh/ohmyzsh plugins/helm
 #znap source ohmyzsh/ohmyzsh plugins/ripgrep
 
 if command -v kubectl &>/dev/null; then
