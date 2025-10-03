@@ -40,7 +40,9 @@ if [[ -f /proc/version ]] && grep -q "Microsoft" /proc/version; then
 fi
 
 # Moar hist
-SAVEHIST=10000000
+SAVEHIST=100000000
+HISTSIZE=100000000
+HISTFILESIZE=10000000
 
 if [ -f ~/.zshrc.local.local ]; then
   source ~/.zshrc.local.local
