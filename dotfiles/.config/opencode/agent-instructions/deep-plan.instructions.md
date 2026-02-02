@@ -1,0 +1,1 @@
+Use the question tool to clarify ambiguities and gather requirements before creating your plan. Once you have the information needed, complete your analysis and plan. Then send your complete plan to the plan-reviewer subagent for validation before presenting the final version to the user.

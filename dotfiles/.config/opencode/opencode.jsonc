@@ -1,0 +1,89 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "autoupdate": true,
+  "share": "disabled",
+  "permission": {
+    "bash": {
+      "*": "ask",
+      "cat *": "allow",
+      "grep *": "allow",
+      "ls *": "allow",
+      "head *": "allow",
+      "tail *": "allow",
+      "rg *": "allow",
+      "wc *": "allow",
+      "git status *": "allow",
+      "git log *": "allow",
+      "git show *": "allow",
+      "git diff *": "allow",
+      "gh issue view *": "allow",
+      "gh issue list *": "allow",
+      "docker build *": "allow",
+      "echo *": "allow"
+    }
+  },
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "linear": {
+      "type": "remote",
+      "url": "https://mcp.linear.app/mcp",
+      "enabled": false
+    },
+    "notion": {
+      "type": "remote",
+      "url": "https://mcp.notion.com/mcp",
+      "enabled": false
+    }
+  },
+  "agent": {
+    "testing-agent": {
+      "description": "Testing",
+      "mode": "subagent",
+      "model": "opencode/kimi-k2.5-free",
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": false
+      }
+    },
+    "plan-reviewer": {
+      "description": "Reviews coding and code design plans",
+      "mode": "subagent",
+      // "model": "github-copilot/gpt-5.2-codex",
+      // "reasoningEffort": "xhigh",
+      // "include": ["reasoning.encrypted_content"],
+      "model": "opencode/kimi-k2.5-free",
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": false
+      }
+    },
+    "codex-xhigh": {
+      "description": "GPT-5.2 Codex with extra-high reasoning effort",
+      "mode": "subagent",
+      // "model": "github-copilot/gpt-5.2-codex",
+      // "reasoningEffort": "xhigh",
+      // "include": ["reasoning.encrypted_content"],
+      "model": "opencode/kimi-k2.5-free",
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": false
+      }
+    },
+    "deep-plan": {
+      "description": "Planning agent that validates plans with plan-reviewer",
+      "mode": "primary",
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": false,
+        "question": true
+      }
+    }
+  }
+}
