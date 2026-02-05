@@ -89,7 +89,6 @@ call plug#begin()
 
 " Languages
 Plug 'dougireton/vim-chef'
-Plug 'elzr/vim-json'
 Plug 'ntpeters/vim-better-whitespace'
 Plug 'rhysd/vim-crystal'
 Plug 'vim-ruby/vim-ruby'
