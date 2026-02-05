@@ -39,7 +39,7 @@
     }
   },
   "agent": {
-    "testing-agent": {
+    "kimi-k2": {
       "description": "Testing",
       "mode": "subagent",
       "model": "opencode/kimi-k2.5-free",
@@ -52,28 +52,21 @@
     "plan-reviewer": {
       "description": "Reviews coding and code design plans",
       "mode": "subagent",
-      // "model": "github-copilot/gpt-5.2-codex",
-      // "reasoningEffort": "xhigh",
-      // "include": ["reasoning.encrypted_content"],
-      "model": "opencode/kimi-k2.5-free",
+      "model": "openai/gpt-5.2",
+      "reasoningEffort": "xhigh",
+      "include": ["reasoning.encrypted_content"],
       "tools": {
         "write": false,
         "edit": false,
         "bash": false
       }
     },
-    "codex-xhigh": {
-      "description": "GPT-5.2 Codex with extra-high reasoning effort",
+    "codex": {
+      "description": "Expert coder that can handle complex coding",
       "mode": "subagent",
-      // "model": "github-copilot/gpt-5.2-codex",
-      // "reasoningEffort": "xhigh",
-      // "include": ["reasoning.encrypted_content"],
-      "model": "opencode/kimi-k2.5-free",
-      "tools": {
-        "write": false,
-        "edit": false,
-        "bash": false
-      }
+      "model": "openai/gpt-5.2-codex",
+      "reasoningEffort": "high",
+      "include": ["reasoning.encrypted_content"]
     },
     "deep-plan": {
       "description": "Planning agent that validates plans with plan-reviewer",
@@ -81,8 +74,7 @@
       "tools": {
         "write": false,
         "edit": false,
-        "bash": false,
-        "question": true
+        "bash": false
       }
     }
   }
