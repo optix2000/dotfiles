@@ -12,6 +12,9 @@
       "tail *": "allow",
       "rg *": "allow",
       "wc *": "allow",
+      "sort *": "allow",
+      "diff *": "allow",
+      "tar -xOf *": "allow",
       "git status *": "allow",
       "git log *": "allow",
       "git show *": "allow",
@@ -19,6 +22,8 @@
       "gh issue view *": "allow",
       "gh issue list *": "allow",
       "docker build *": "allow",
+      "helm template *": "allow",
+      "helm lint *": "allow",
       "echo *": "allow"
     }
   },
