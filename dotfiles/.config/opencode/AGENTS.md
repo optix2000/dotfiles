@@ -30,6 +30,20 @@ Do NOT attempt workarounds, alternative API calls, or web searches as substitute
 
 ---
 
+## Subagent Use
+
+NEVER use the explore agent for web searches. You may only use it for local exploration.
+ALWAYS give the subagents the same tool/mcp instructions in this doc.
+
+---
+
+## /tmp Usage
+
+If you need to use /tmp for whatever reason:
+ALWAYS place files in /tmp/opencode
+You MAY create the folder if it's missing.
+ALWAYS clean up after you're done with the files.
+
 ## Error Handling
 
 | Error Type | Action |
@@ -44,9 +58,11 @@ Do NOT attempt workarounds, alternative API calls, or web searches as substitute
 
 When working with GitHub (repos, issues, pull requests, releases, diffs, file contents):
 
-1. Prefer the built-in GitHub tools (`github_*`) over `webfetch` for GitHub.
+1. ALWAYS use the GitHub tools (`github_*`) over `webfetch` for GitHub access.
 2. If the GitHub tools are missing from the available tools list, or a GitHub tool call fails because the tool is unavailable/unauthorized, you MAY fall back to `gh` (via the Bash tool) or `webfetch`.
 3. If you fall back, you MUST explicitly warn the user that you are doing so and why (e.g., "GitHub tools unavailable here; using `gh`/`webfetch` as a fallback").
+
+If you call out to a subagent or create a task, you MUST give it the same requirements above.
 
 ---
 
