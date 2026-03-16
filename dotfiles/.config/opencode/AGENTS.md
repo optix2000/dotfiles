@@ -2,9 +2,9 @@
 
 Two MCPs are available but **may not be enabled** for security reasons.
 
-| MCP | Prefix | Purpose |
-|-----|--------|---------|
-| Notion | `notion_` | Documentation |
+| MCP    | Prefix    | Purpose        |
+| ------ | --------- | -------------- |
+| Notion | `notion_` | Documentation  |
 | Linear | `linear_` | Issue tracking |
 
 **Before using any MCP functionality, you MUST:**
@@ -30,6 +30,16 @@ Do NOT attempt workarounds, alternative API calls, or web searches as substitute
 
 ---
 
+## Error Handling
+
+| Error Type           | Action                                                 |
+| -------------------- | ------------------------------------------------------ |
+| Auth error (401/403) | Stop the MCP-dependent portion and report to user      |
+| Resource not found   | Ask user to verify the resource name or ID             |
+| Network/timeout      | Wait briefly, retry once, then report if still failing |
+
+---
+
 ## Subagent Use
 
 NEVER use the explore agent for web searches. You may only use it for local exploration.
@@ -44,13 +54,12 @@ ALWAYS place files in /tmp/opencode
 You MAY create the folder if it's missing.
 ALWAYS clean up after you're done with the files.
 
-## Error Handling
+---
 
-| Error Type | Action |
-|------------|--------|
-| Auth error (401/403) | Stop the MCP-dependent portion and report to user |
-| Resource not found | Ask user to verify the resource name or ID |
-| Network/timeout | Wait briefly, retry once, then report if still failing |
+## Python Usage
+
+If using python for whatever reason, ALWAYS use python3 instead of python.
+ALWAYS check if a virtualenv exists in the project folder or working directory and use it if it exists.
 
 ---
 
@@ -86,24 +95,33 @@ When you need to ask the user a question (e.g., to clarify requirements, get pre
 
 ---
 
+## Git Usage
+
+When using `git`, ALWAYS call it in a way that does not invoke an editor as you cannot interact with an editor.
+
+---
+
 ## Parallelization
 
 Maximize efficiency by working in parallel whenever possible:
 
 **2. Concurrent File Reads**
 Before editing multiple files:
+
 - Read ALL relevant files in parallel first (batch read calls in a single message)
 - Analyze patterns across the codebase
 - Then make sequential edits with full context
 
 **3. Parallel Task Delegation**
 For independent subtasks, launch multiple agents concurrently:
+
 - Delegate component reviews to separate agents
 - Delegate tests for different modules in parallel
 - Use map-reduce patterns: same task on different inputs
 
 **4. Search Strategy**
 Use efficient search patterns that work across the entire codebase:
+
 - `glob("**/*.test.js")` returns all matches at once
 - `grep("pattern", include="*.ts")` searches entire codebase
 - Avoid sequential file-by-file iteration with bash loops
@@ -113,7 +131,9 @@ Use efficient search patterns that work across the entire codebase:
 ## Examples
 
 ✅ **Correct:**
+
 > "The Linear MCP is not currently enabled. Please enable it to proceed with creating this issue."
 
 ❌ **Incorrect:**
+
 > Proceeding to draft issue content without mentioning Linear is unavailable, or attempting to use web APIs as a workaround.
