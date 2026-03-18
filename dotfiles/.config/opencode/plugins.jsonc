@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/optix2000/opencode-plugin-manager/main/plugins.schema.json",
+  "autoinstall": true,
+  "plugins": [
+    {
+      "source": "git",
+      "repo": "git@github.com:optix2000/opencode-ast.git"
+    }
+  ]
+}
