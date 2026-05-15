@@ -4,7 +4,19 @@
   "plugins": [
     {
       "source": "git",
-      "repo": "git@github.com:optix2000/opencode-ast.git"
+      "repo": "https://github.com/optix2000/opencode-ast.git"
+    },
+    {
+      "source": "git",
+      "repo": "https://github.com/optix2000/opencode-config-d.git"
+    },
+    {
+      "source": "git",
+      "repo": "https://github.com/optix2000/opencode-provider-system-prompts.git"
+    },
+    {
+      "source": "git",
+      "repo": "https://github.com/optix2000/opencode-agent-instructions.git"
     }
   ]
 }
