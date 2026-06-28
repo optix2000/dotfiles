@@ -88,29 +88,24 @@ endtry
 call plug#begin()
 
 " Languages
-Plug 'dougireton/vim-chef'
 Plug 'ntpeters/vim-better-whitespace'
-Plug 'rhysd/vim-crystal'
+Plug 'vim-crystal/vim-crystal'
 Plug 'vim-ruby/vim-ruby'
-Plug 'davidhalter/jedi-vim'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-Plug 'lepture/vim-jinja'
+Plug 'HiPhish/jinja.vim'
 Plug 'hashivim/vim-terraform'
 " Autocomplete
 if has('nvim')
-  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-else
-  Plug 'Shougo/deoplete.nvim'
-  Plug 'roxma/nvim-yarp'
-  Plug 'roxma/vim-hug-neovim-rpc', { 'do': 'pip3 install pynvim' }
+  Plug 'hrsh7th/nvim-cmp'
+  Plug 'hrsh7th/cmp-nvim-lsp'
+  Plug 'hrsh7th/cmp-buffer'
+  Plug 'hrsh7th/cmp-path'
+  Plug 'hrsh7th/cmp-cmdline'
 endif
 " Other integrations
-Plug 'w0rp/ale'
 Plug 'itchyny/lightline.vim'
-Plug 'maximbaz/lightline-ale'
 Plug 'airblade/vim-gitgutter'
 " Misc
-Plug 'terryma/vim-multiple-cursors'
 Plug 'preservim/tagbar'
 
 call plug#end()
@@ -128,25 +123,103 @@ filetype indent on
 au BufNewFile,BufRead *.sls set filetype=yaml
 au BufNewFile,BufRead Jenkinsfile setf groovy
 " --------------
-" Neocomplete configs
+" Neovim completion and LSP configs
 " --------------
-let g:deoplete#enable_at_startup = 1
+if has('nvim')
+  set completeopt=menu,menuone,noselect
 
-" https://github.com/fatih/vim-go/blob/3a8e3f6ded412b25fb3c13eecf76d5809fa175e8/doc/vim-go.txt#L147
-" python regex stolen from jedi-vim
-set completeopt+=noselect
-call deoplete#custom#var('omni', 'input_patterns', {
-      \  'go': '[^. *\t]\.\w*',
-      \  'c': '[^.[:digit:] *\t]\%(\.\|->\)\w*',
-      \  'cpp': '[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*',
-      \  'python': '[^. \t0-9]\.\w*$|^\s*@\w*$|^\s*from\s.+import \w*|^\s*from \w*|^\s*import \w*',
-      \})
-call deoplete#custom#option('omni_patterns', {
-      \  'ruby': ['[^. *\t]\.\w*', '[a-zA-Z_]\w*::'],
-      \})
+  lua << EOF
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+local ok_cmp_lsp, cmp_lsp = pcall(require, 'cmp_nvim_lsp')
 
-"Map tab to completion for tab completion
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+if ok_cmp_lsp then
+  capabilities = cmp_lsp.default_capabilities(capabilities)
+end
+
+local ok_cmp, cmp = pcall(require, 'cmp')
+
+if ok_cmp then
+  cmp.setup({
+    snippet = {
+      expand = function(args)
+        if vim.snippet then
+          vim.snippet.expand(args.body)
+        end
+      end,
+    },
+    mapping = cmp.mapping.preset.insert({
+      ['<C-Space>'] = cmp.mapping.complete(),
+      ['<CR>'] = cmp.mapping.confirm({ select = false }),
+      ['<Tab>'] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_next_item()
+        else
+          fallback()
+        end
+      end, { 'i', 's' }),
+      ['<S-Tab>'] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.select_prev_item()
+        else
+          fallback()
+        end
+      end, { 'i', 's' }),
+    }),
+    sources = cmp.config.sources({
+      { name = 'nvim_lsp' },
+      { name = 'path' },
+    }, {
+      { name = 'buffer' },
+    }),
+  })
+
+  cmp.setup.cmdline({ '/', '?' }, {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {
+      { name = 'buffer' },
+    },
+  })
+
+  cmp.setup.cmdline(':', {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+      { name = 'path' },
+    }, {
+      { name = 'cmdline' },
+    }),
+  })
+end
+
+local function start_lsp(name, cmd, root_markers)
+  if vim.fn.executable(cmd[1]) ~= 1 then
+    return
+  end
+
+  local root_dir = vim.fs.root(0, root_markers) or vim.fn.getcwd()
+
+  vim.lsp.start({
+    name = name,
+    cmd = cmd,
+    root_dir = root_dir,
+    capabilities = capabilities,
+  })
+end
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'go', 'gomod', 'gowork', 'gotmpl' },
+  callback = function()
+    start_lsp('gopls', { 'gopls' }, { 'go.work', 'go.mod', '.git' })
+  end,
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'python',
+  callback = function()
+    start_lsp('pyright', { 'pyright-langserver', '--stdio' }, { 'pyrightconfig.json', 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', 'Pipfile', '.git' })
+  end,
+})
+EOF
+endif
 
 " --------------
 " Language specific configs
@@ -165,6 +238,11 @@ let g:go_highlight_types = 1
 let g:go_highlight_extra_types = 1
 " We're ok with degraded functionality on older vims
 let g:go_version_warning = 0
+" Native Neovim LSP handles Go completion and gopls integration.
+if has('nvim')
+  let g:go_code_completion_enabled = 0
+  let g:go_gopls_enabled = 0
+endif
 
 " Ruby
 " Actually enable autocomplete
@@ -172,33 +250,44 @@ let g:rubycomplete_buffer_loading = 1
 let g:rubycomplete_classes_in_global = 1
 
 " ---------------
-"  Ale Configs
-" ---------------
-let g:ale_linters = { 'go': ['go build', 'gofmt', 'golint', 'go vet'] }
-
-" ---------------
 " Lightline configs
 " ---------------
 let g:lightline = {}
-" Ale integration
-let g:lightline#ale#indicator_warnings = "\U26A0 "
-let g:lightline#ale#indicator_errors = "\U2718 "
+
+function! LightlineDiagnosticCount(severity) abort
+  if !has('nvim')
+    return 0
+  endif
+  return luaeval("#vim.diagnostic.get(0, { severity = vim.diagnostic.severity[_A] })", a:severity)
+endfunction
+
+function! LightlineDiagnosticWarnings() abort
+  let l:count = LightlineDiagnosticCount('WARN')
+  return l:count > 0 ? printf('W:%d', l:count) : ''
+endfunction
+
+function! LightlineDiagnosticErrors() abort
+  let l:count = LightlineDiagnosticCount('ERROR')
+  return l:count > 0 ? printf('E:%d', l:count) : ''
+endfunction
+
+function! LightlineDiagnosticOk() abort
+  return LightlineDiagnosticCount('ERROR') + LightlineDiagnosticCount('WARN') == 0 ? 'OK' : ''
+endfunction
 
 let g:lightline.component_expand = {
-      \  'linter_checking': 'lightline#ale#checking',
-      \  'linter_warnings': 'lightline#ale#warnings',
-      \  'linter_errors': 'lightline#ale#errors',
-      \  'linter_ok': 'lightline#ale#ok',
+      \  'diagnostic_warnings': 'LightlineDiagnosticWarnings',
+      \  'diagnostic_errors': 'LightlineDiagnosticErrors',
+      \  'diagnostic_ok': 'LightlineDiagnosticOk',
       \ }
 let g:lightline.component_type = {
-      \     'linter_checking': 'left',
-      \     'linter_warnings': 'warning',
-      \     'linter_errors': 'error',
-      \     'linter_ok': 'left',
+      \     'diagnostic_warnings': 'warning',
+      \     'diagnostic_errors': 'error',
+      \     'diagnostic_ok': 'left',
       \ }
 
 " Lightline
-let g:lightline.active = { 'right':[[ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok'], ['lineinfo'], ['percent'], ['fileformat', 'fileencoding', 'filetype']] }
+let g:lightline.active = { 'right':[[ 'diagnostic_errors', 'diagnostic_warnings', 'diagnostic_ok'], ['lineinfo'], ['percent'], ['fileformat', 'fileencoding', 'filetype']] }
 
 " Source local vimrc
 let $LOCAL_VIMRC = '~/.vimrc.local'
