@@ -1,0 +1,58 @@
+name: End-to-End Tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chezmoi:
+    name: Chezmoi apply and verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build test image
+        run: docker build --pull --tag dotfiles/base .
+
+      - name: Apply dotfiles in container
+        run: |
+          docker run --rm --volume "$PWD:/home/user/dotfiles:ro" dotfiles/base bash -euxo pipefail -c '
+            export CHEZMOI_SKIP_VIM_PLUG=1
+
+            chezmoi --source=/home/user/dotfiles --destination=/home/user apply --refresh-externals
+            chezmoi --source=/home/user/dotfiles --destination=/home/user verify --exclude=scripts,externals
+
+            test -f "$HOME/.zshrc"
+            test -f "$HOME/.vimrc"
+            test -f "$HOME/.config/opencode/opencode.jsonc"
+            test -f "$HOME/.gitconfig"
+
+            test -d "$HOME/.zsh/cache"
+            test -d "$HOME/.zsh/zsh-snap/.git"
+            test -s "$HOME/.vim/autoload/plug.vim"
+            test "$(stat -c %a "$HOME/.vim/autoload")" = "750"
+            test -d "$HOME/.vim/undodir"
+            test "$(stat -c %a "$HOME/.vim/undodir")" = "700"
+
+            test "$(git config --global user.name)" = "Weilu Jia"
+            test "$(git config --global user.email)" = "optix2000@teitoku.net"
+
+            zsh -n "$HOME/.zshrc"
+            zsh -n "$HOME/.zshrc.pre"
+            zsh -n "$HOME/.zshrc.local"
+
+            printf "e2e assertions passed\n"
+          '

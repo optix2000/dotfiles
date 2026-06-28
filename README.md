@@ -1,4 +1,4 @@
-# Dotfiles and stuff [![Build Status](https://travis-ci.org/optix2000/dotfiles.svg?branch=master)](https://travis-ci.org/optix2000/dotfiles)
+# Dotfiles and stuff [![End-to-End Tests](https://github.com/optix2000/dotfiles/actions/workflows/e2e.yml/badge.svg?branch=master)](https://github.com/optix2000/dotfiles/actions/workflows/e2e.yml)
 
 Managed with [chezmoi](https://www.chezmoi.io/).
 
