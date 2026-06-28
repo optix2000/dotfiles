@@ -1,4 +1,9 @@
-source ~/.zsh/zsh-snap/znap.zsh
+if [[ -r "$HOME/.zsh/zsh-snap/znap.zsh" ]]; then
+  source "$HOME/.zsh/zsh-snap/znap.zsh"
+else
+  print -u2 'zsh-snap is not installed; run chezmoi apply --refresh-externals.'
+  return 0
+fi
 
 # Install base zshrc
 znap clone grml/grml-etc-core
@@ -6,7 +11,11 @@ source ~/.zsh/grml/grml-etc-core/etc/zsh/zshrc
 
 # Set homebrew path
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  eval $(/opt/homebrew/bin/brew shellenv)
+  if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
 fi
 
 znap source ohmyzsh/ohmyzsh plugins/terraform

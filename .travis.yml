@@ -5,4 +5,8 @@ services:
 before_install:
   - docker build --pull --tag dotfiles/base .
 script:
-  - 'docker run --tty --volume `pwd`:/home/user/dotfiles dotfiles/base bash -c "cat dotfiles/setup.sh | bash"'
+  - >-
+    docker run --tty --volume `pwd`:/home/user/dotfiles dotfiles/base bash -lc
+    'CHEZMOI_SKIP_VIM_PLUG=1
+    chezmoi --source=/home/user/dotfiles --destination=/home/user apply --refresh-externals &&
+    chezmoi --source=/home/user/dotfiles --destination=/home/user verify'

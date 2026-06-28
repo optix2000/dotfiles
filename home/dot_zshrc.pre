@@ -13,6 +13,13 @@ if [[ -z "$ZSH_CACHE_DIR" ]]; then
   ZSH_CACHE_DIR="$HOME/.zsh/cache"
 fi
 
+if command -v go >/dev/null 2>&1; then
+  export GOPATH="${GOPATH:-$HOME/go}"
+  case ":$PATH:" in
+    *":$GOPATH/bin:"*) ;;
+    *) export PATH="$GOPATH/bin:$PATH" ;;
+  esac
+fi
 
 # Load local envs
 if [ -f ~/.zshrc.pre.local ]; then

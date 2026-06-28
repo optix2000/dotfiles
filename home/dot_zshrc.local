@@ -44,6 +44,10 @@ SAVEHIST=100000000
 HISTSIZE=100000000
 HISTFILESIZE=10000000
 
+if command -v nvim >/dev/null 2>&1; then
+  alias vim=nvim
+fi
+
 if [ -f ~/.zshrc.local.local ]; then
   source ~/.zshrc.local.local
 fi
