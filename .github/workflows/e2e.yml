@@ -48,7 +48,8 @@ jobs:
             test "$(stat -c %a "$HOME/.vim/undodir")" = "700"
 
             test "$(git config --global user.name)" = "Weilu Jia"
-            test "$(git config --global user.email)" = "optix2000@teitoku.net"
+            ! git config --global --get user.email
+            test "$(git config --global pull.rebase)" = "true"
 
             zsh -n "$HOME/.zshrc"
             zsh -n "$HOME/.zshrc.pre"

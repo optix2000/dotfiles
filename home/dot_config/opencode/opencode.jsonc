@@ -28,6 +28,7 @@
       "git diff *": "allow",
       "gh issue view *": "allow",
       "gh issue list *": "allow",
+      "gofmt *": "allow",
       "docker build *": "allow",
       "helm template *": "allow",
       "helm lint *": "allow",
@@ -51,21 +52,11 @@
     }
   },
   "agent": {
-    "kimi-k2": {
-      "description": "Testing",
-      "mode": "subagent",
-      "model": "opencode/kimi-k2.5-free",
-      "tools": {
-        "write": false,
-        "edit": false,
-        "bash": false
-      }
-    },
     "plan-reviewer": {
       "description": "Reviews coding and code design plans",
       "mode": "subagent",
-      "model": "openai/gpt-5.4",
-      "reasoningEffort": "xhigh",
+      "model": "openai/gpt-5.6-sol",
+      "reasoningEffort": "high",
       "include": ["reasoning.encrypted_content"],
       "tools": {
         "write": false,
@@ -73,10 +64,10 @@
         "bash": false
       }
     },
-    "codex": {
-      "description": "Expert coder that can handle complex coding",
+    "coder": {
+      "description": "Expert coder that can handle complex coding. Use for parallelizing independent coding tasks.",
       "mode": "subagent",
-      "model": "openai/gpt-5.3-codex",
+      "model": "openai/gpt-5.6-sol",
       "reasoningEffort": "high",
       "include": ["reasoning.encrypted_content"]
     },

@@ -6,9 +6,10 @@ modelRegex: "^.+/claude-opus.*$"
 
 Do NOT delegate to the Task tool any trivial tasks, like reading files verbatim, or exploring very small repos. If it's something you can do yourself in <10 tool calls, just do it yourself.
 
-# On Coding
+# On Subagent Delegation
 
 NEVER give explicit code instructions when delegating coding. DO provide context that will help better understand the problem and the scope.
+NEVER ask for literal changes or diffs. The subagent is smart enough to understand instructions.
 
 ## BAD
 
@@ -19,6 +20,21 @@ NEVER give explicit code instructions when delegating coding. DO provide context
 - After the producer loop, print it with eprintln: `eprintln!("[headers] ETL insert: {etl_insert_elapsed_total:.1?}");`
 
 ### Example 2
+
+Around lines 65–67 the comment above the `warnDeprecatedBootstrapOptions` call currently reads:
+```
+  // Surface any legacy bootstrap.* options the user still has configured
+  // once at load time, so they don't get silently ignored workspace after
+  // workspace under the runtime-baked template design.
+```
+Replace with:
+```
+  // Warn once per process if deprecated bootstrap.* options are set; their
+  // values are validated for schema compatibility but no longer affect
+  // runtime behavior.
+```
+
+### Example 3
 
 The new code should look like this (replacing lines 599-634):
 ```rust
