@@ -25,9 +25,7 @@ ALWAYS check if a virtualenv exists in the project folder or working directory a
 
 When working with GitHub (repos, issues, pull requests, releases, diffs, file contents):
 
-1. ALWAYS use the GitHub tools (`github_*`) over `webfetch` for GitHub access.
-2. If the GitHub tools are missing from the available tools list, or a GitHub tool call fails because the tool is unavailable/unauthorized, you MAY fall back to `gh` (via the Bash tool) or `webfetch`.
-3. If you fall back, you MUST explicitly warn the user that you are doing so and why (e.g., "GitHub tools unavailable here; using `gh`/`webfetch` as a fallback").
+1. ALWAYS delegate GitHub actions to the `github` subagent.
 
 If you call out to a subagent or create a task, you MUST give it the same requirements above.
 

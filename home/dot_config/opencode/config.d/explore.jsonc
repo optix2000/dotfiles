@@ -1,0 +1,12 @@
+{
+  "agent": {
+    "explore": {
+      "model": "openai/gpt-5.6-luna",
+      "reasoningEffort": "high",
+      "include": ["reasoning.encrypted_content"],
+      "permission": {
+        "ast": "allow"
+      }
+    }
+  }
+}
