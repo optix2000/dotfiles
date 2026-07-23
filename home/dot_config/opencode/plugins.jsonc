@@ -1,6 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/optix2000/opencode-plugin-manager/main/plugins.schema.json",
   "autoinstall": true,
+  "reportPlugins": true,
   "plugins": [
     {
       "source": "git",
