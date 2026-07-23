@@ -5,6 +5,8 @@
   "plugin": ["opencode-plugin-manager"],
   "permission": {
     "github_*": "deny",
+    "linear_*": "deny",
+    "notion_*": "deny",
     "bash": {
       "*": "ask",
       "cat *": "allow",
@@ -48,12 +50,12 @@
     "linear": {
       "type": "remote",
       "url": "https://mcp.linear.app/mcp",
-      "enabled": false
+      "enabled": true
     },
     "notion": {
       "type": "remote",
       "url": "https://mcp.notion.com/mcp",
-      "enabled": false
+      "enabled": true
     }
   },
   "agent": {

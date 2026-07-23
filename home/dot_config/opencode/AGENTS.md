@@ -31,6 +31,14 @@ If you call out to a subagent or create a task, you MUST give it the same requir
 
 ---
 
+## Corporate Knowledge Tool Preference
+
+When working with corporate knowledge in Notion or Linear:
+
+1. ALWAYS delegate the task to the `corporate-docs` subagent.
+
+---
+
 ## Context7 for Library Documentation
 
 When working with common libraries or frameworks, use Context7 to fetch up-to-date documentation:
