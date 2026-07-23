@@ -23,9 +23,11 @@ ALWAYS check if a virtualenv exists in the project folder or working directory a
 
 ## GitHub Tool Preference
 
-When working with GitHub (repos, issues, pull requests, releases, diffs, file contents):
+When a task needs a concrete GitHub service operation, such as viewing, searching, creating, or updating a repository, issue, pull request, release, workflow run, or comment:
 
-1. ALWAYS delegate GitHub actions to the `github` subagent.
+1. Delegate only that GitHub operation to the `github` subagent.
+2. Keep the delegation prompt limited to the requested GitHub operation and its necessary resource details.
+3. Do not delegate coding, code review, source or repository-change analysis, debugging, planning, implementation decisions, or unrelated research to the `github` subagent. Perform that work in the calling agent or delegate it to an appropriate specialist.
 
 If you call out to a subagent or create a task, you MUST give it the same requirements above.
 
