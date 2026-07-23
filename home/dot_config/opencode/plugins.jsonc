@@ -4,6 +4,14 @@
   "reportPlugins": true,
   "plugins": [
     {
+      "source": "npm",
+      "name": "@vectorize-io/opencode-hindsight",
+      "options": {
+        "hindsightApiUrl": "http://localhost:8888",
+        "recallBudget": "high"
+      }
+    },
+    {
       "source": "git",
       "repo": "https://github.com/optix2000/opencode-ast.git"
     },
