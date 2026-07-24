@@ -1,0 +1,101 @@
+# Linux Landlock policy for safe-agent. Enforced with the llconfig reference
+# launcher from landlockconfig. Network access remains unrestricted to match the
+# macOS profile; Docker requires a runtime grant from --enable=docker.
+
+abi = 6
+
+[[variable]]
+name = "home"
+literal = ["{{ .chezmoi.homeDir }}"]
+
+# Handle every filesystem operation known to ABI 6. Anything not allowed below
+# is denied, including writes to credential stores and Docker by default.
+[[ruleset]]
+handled_access_fs = ["abi.all"]
+
+# Program binaries, dynamic libraries, package metadata, and system
+# configuration needed by language runtimes and package managers.
+[[path_beneath]]
+allowed_access = ["abi.read_execute"]
+parent = [
+    "/bin",
+    "/lib",
+    "/lib64",
+    "/sbin",
+    "/usr",
+    "/opt",
+    "/etc",
+    "/proc",
+    "/sys",
+]
+
+# Shell I/O and scratch locations.
+[[path_beneath]]
+allowed_access = ["abi.read_write"]
+parent = [
+    "/tmp",
+    "/var/tmp",
+    "/dev/full",
+    "/dev/null",
+    "/dev/random",
+    "/dev/tty",
+    "/dev/urandom",
+    "/dev/zero",
+    "/dev/ptmx",
+    "/dev/shm",
+]
+
+# OpenCode state and the user-managed executable directory.
+[[path_beneath]]
+allowed_access = ["abi.read_write"]
+parent = [
+    "${home}/.config/opencode",
+    "${home}/.cache/opencode",
+    "${home}/.cache/opencode-ast",
+    "${home}/.local/share/opencode",
+    "${home}/.local/share/opentui",
+    "${home}/.local/state/opencode",
+    "${home}/.opencode",
+    "${home}/.opencode.json",
+]
+
+[[path_beneath]]
+allowed_access = ["abi.read_execute"]
+parent = ["${home}/.local/bin"]
+
+# Language and package-manager caches that agents may populate.
+[[path_beneath]]
+allowed_access = ["abi.read_write"]
+parent = [
+    "${home}/.npm",
+    "${home}/.cache/pnpm",
+    "${home}/.local/share/pnpm",
+    "${home}/.cache/uv",
+    "${home}/.local/share/uv",
+    "${home}/.local/state/uv",
+    "${home}/.config/uv",
+    "${home}/.cache/pip",
+    "${home}/go",
+    "${home}/.cache/go-build",
+    "${home}/.cache/golangci-lint",
+    "${home}/.cache/gopls",
+    "${home}/.cache/mise",
+    "${home}/.local/share/mise",
+    "${home}/.cache/packer",
+]
+
+# Shared working tree grant. safe-agent adds a second grant for the invocation
+# directory, allowing use outside this conventional project location too.
+[[path_beneath]]
+allowed_access = ["abi.read_write"]
+parent = ["${home}/repos"]
+
+# Git can read its configuration and host verification data but cannot access
+# private keys, SSH configuration, cloud credentials, or Docker state.
+[[path_beneath]]
+allowed_access = ["abi.read_execute"]
+parent = [
+    "${home}/.gitconfig",
+    "${home}/.gitconfig.local",
+    "${home}/.ssh/known_hosts",
+]

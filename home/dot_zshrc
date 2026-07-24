@@ -16,22 +16,34 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   elif [[ -x /usr/local/bin/brew ]]; then
     eval "$(/usr/local/bin/brew shellenv)"
   fi
+fi
 
+case "$OSTYPE" in
+  darwin*)
   case ":$PATH:" in
     *":$HOME/.local/bin:"*) ;;
     *) export PATH="$HOME/.local/bin:$PATH" ;;
   esac
 
   export SAFE_AGENT_PROFILE="$HOME/.config/sandbox/agent-base.sb"
+  ;;
+  linux*)
+  case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) export PATH="$HOME/.local/bin:$PATH" ;;
+  esac
 
-  safe-opencode() {
-    SAFE_OPENCODE_ALLOW_ALL="${SAFE_OPENCODE_ALLOW_ALL:-1}" safe-agent opencode "$@"
-  }
+  export SAFE_AGENT_PROFILE="$HOME/.config/landlock/agent-base.toml"
+  ;;
+esac
 
-  safe-opencode-docker() {
-    SAFE_OPENCODE_ALLOW_ALL="${SAFE_OPENCODE_ALLOW_ALL:-1}" safe-agent --enable=docker opencode "$@"
-  }
-fi
+safe-opencode() {
+  SAFE_OPENCODE_ALLOW_ALL="${SAFE_OPENCODE_ALLOW_ALL:-1}" safe-agent opencode "$@"
+}
+
+safe-opencode-docker() {
+  SAFE_OPENCODE_ALLOW_ALL="${SAFE_OPENCODE_ALLOW_ALL:-1}" safe-agent --enable=docker opencode "$@"
+}
 
 znap source ohmyzsh/ohmyzsh plugins/terraform
 znap source ohmyzsh/ohmyzsh plugins/gem
