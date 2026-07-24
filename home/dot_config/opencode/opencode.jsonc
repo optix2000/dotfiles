@@ -37,6 +37,7 @@
       "gh issue list *": "allow",
       "gofmt *": "allow",
       "go vet *": "allow",
+      "go generate *": "allow",
       "docker build *": "allow",
       "helm template *": "allow",
       "helm lint *": "allow",
