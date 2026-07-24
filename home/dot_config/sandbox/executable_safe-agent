@@ -1,0 +1,192 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROFILE="${SAFE_AGENT_PROFILE:-$HOME/.config/sandbox/agent-base.sb}"
+
+usage() {
+  printf 'usage: safe-agent [--enable=docker] [--workdir=/path] <command> [args...]\n' >&2
+}
+
+ENABLE_DOCKER=0
+WORKDIR="${SAFE_AGENT_WORKDIR:-}"
+
+case "${SAFE_AGENT_ENABLE_DOCKER:-}" in
+  1|true|TRUE|yes|YES|on|ON)
+    ENABLE_DOCKER=1
+    ;;
+esac
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --enable=docker)
+      ENABLE_DOCKER=1
+      shift
+      ;;
+    --enable=*)
+      printf 'safe-agent: unsupported integration: %s\n' "${1#--enable=}" >&2
+      exit 64
+      ;;
+    --workdir=*)
+      WORKDIR="${1#--workdir=}"
+      shift
+      ;;
+    --workdir)
+      if [[ $# -lt 2 ]]; then
+        printf 'safe-agent: --workdir requires a path\n' >&2
+        exit 64
+      fi
+      WORKDIR="$2"
+      shift 2
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+if [[ $# -lt 1 ]]; then
+  usage
+  exit 64
+fi
+
+if [[ ! -r "$PROFILE" ]]; then
+  printf 'safe-agent: profile not readable: %s\n' "$PROFILE" >&2
+  exit 66
+fi
+
+if [[ -z "$WORKDIR" ]]; then
+  WORKDIR="$(pwd -P)"
+elif [[ -d "$WORKDIR" ]]; then
+  WORKDIR="$(cd "$WORKDIR" && pwd -P)"
+else
+  printf 'safe-agent: workdir is not a directory: %s\n' "$WORKDIR" >&2
+  exit 66
+fi
+
+COMMAND_BASENAME="$(basename -- "$1")"
+
+case "${SAFE_OPENCODE_ALLOW_ALL:-}" in
+  1|true|TRUE|yes|YES|on|ON)
+    if [[ "$COMMAND_BASENAME" == "opencode" ]]; then
+      if [[ -n "${OPENCODE_CONFIG_CONTENT:-}" ]]; then
+        printf 'safe-agent: OPENCODE_CONFIG_CONTENT is already set; refusing to override it\n' >&2
+        exit 78
+      fi
+      export OPENCODE_CONFIG_CONTENT='{"permission":"allow"}'
+    fi
+    ;;
+esac
+
+escape_sb() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  printf '%s' "$s"
+}
+
+emit_ancestor_literals() {
+  local path="$1"
+  local label="$2"
+  local current part escaped
+  local -a parts=()
+  IFS='/' read -r -a parts <<< "${path#/}"
+
+  printf '\n;; Runtime ancestor directory literals for %s: %s\n' "$label" "$(escape_sb "$path")"
+  printf '(allow file-read*\n'
+  printf '    (literal "/")\n'
+
+  current=""
+  for part in "${parts[@]}"; do
+    [[ -n "$part" ]] || continue
+    current="${current}/${part}"
+    escaped="$(escape_sb "$current")"
+    printf '    (literal "%s")\n' "$escaped"
+  done
+
+  printf ')\n'
+}
+
+emit_path_grant() {
+  local mode="$1"
+  local path="$2"
+  local label="$3"
+  local escaped
+
+  emit_ancestor_literals "$path" "$label"
+  escaped="$(escape_sb "$path")"
+
+  if [[ -d "$path" ]]; then
+    printf '(allow %s (subpath "%s"))\n' "$mode" "$escaped"
+  else
+    printf '(allow %s (literal "%s"))\n' "$mode" "$escaped"
+  fi
+}
+
+emit_docker_integration() {
+  printf '\n;; ---------------------------------------------------------------------------\n'
+  printf ';; Integration: Docker\n'
+  printf ';; Docker daemon socket access for container operations. High-risk.\n'
+  printf ';; Source: runtime --enable=docker, modeled on 55-integrations-optional/docker.sb\n'
+  printf ';; ---------------------------------------------------------------------------\n'
+
+  emit_ancestor_literals "$HOME/.docker" "Docker CLI state"
+  emit_ancestor_literals "$HOME/.docker/run" "Docker Desktop socket directory"
+
+  printf '\n(allow file-read* file-write*\n'
+  printf '    (literal "/var/run/docker.sock")\n'
+  printf '    (literal "/private/var/run/docker.sock")\n'
+  printf '    (home-literal "/.docker/run/docker.sock")\n'
+  printf '    (home-subpath "/.docker")\n'
+  printf ')\n'
+
+  printf '\n;; Re-allow connect() on Docker unix sockets.\n'
+  printf '(allow network-outbound\n'
+  printf '    (remote unix-socket (path-literal "/var/run/docker.sock"))\n'
+  printf '    (remote unix-socket (path-literal "/private/var/run/docker.sock"))\n'
+  printf '    (remote unix-socket (path-regex (string-append "^" HOME_DIR "/\\.docker/run/docker\\.sock$")))\n'
+  printf ')\n'
+}
+
+emit_final_sensitive_denies() {
+  local docker_enabled="$1"
+
+  printf '\n;; Runtime final sensitive denies repeated after dynamic grants.\n'
+  printf '(deny file-read* file-write*\n'
+  printf '    (home-subpath "/.ssh/agent")\n'
+  printf '    (home-prefix "/.ssh/id_")\n'
+  printf '    (home-literal "/.ssh/config")\n'
+  if [[ "$docker_enabled" != "1" ]]; then
+    printf '    (home-subpath "/.docker")\n'
+  fi
+  printf '    (home-subpath "/.terraform.d")\n'
+  printf '    (home-subpath "/.config/gcloud")\n'
+  printf '    (home-subpath "/.gsutil")\n'
+  printf ')\n'
+}
+
+tmp_profile="$(mktemp "${TMPDIR:-/tmp}/safe-agent.XXXXXX.sb")"
+trap 'rm -f "$tmp_profile"' EXIT INT TERM
+
+cp "$PROFILE" "$tmp_profile"
+
+{
+  printf '\n;; ---------------------------------------------------------------------------\n'
+  printf ';; Runtime workdir grant from safe-agent wrapper.\n'
+  printf ';; Invocation directory resolved with pwd -P: %s\n' "$(escape_sb "$WORKDIR")"
+  printf ';; ---------------------------------------------------------------------------\n'
+  emit_path_grant "file-read* file-write*" "$WORKDIR" "invocation workdir"
+  if [[ "$ENABLE_DOCKER" == "1" ]]; then
+    emit_docker_integration
+  fi
+  emit_final_sensitive_denies "$ENABLE_DOCKER"
+} >> "$tmp_profile"
+
+exec /usr/bin/sandbox-exec -f "$tmp_profile" "$@"

@@ -1,0 +1,397 @@
+(version 1)
+
+;; ---------------------------------------------------------------------------
+;; Custom Agent Sandbox Profile
+;; Structure follows Agent Safehouse order:
+;; 00-base, 10-system-runtime, 20-network, selected 30-toolchains,
+;; selected 40-shared behavior, 50-integrations-core, selected 60-agents,
+;; explicit path grants, final sensitive denies.
+;; ---------------------------------------------------------------------------
+
+;; 00-base.sb influence: fixed HOME_DIR, helper macros, deny by default.
+(define HOME_DIR "{{ .chezmoi.homeDir }}")
+
+(define (home-subpath rel) (subpath (string-append HOME_DIR rel)))
+(define (home-literal rel) (literal (string-append HOME_DIR rel)))
+(define (home-prefix rel) (prefix (string-append HOME_DIR rel)))
+
+(deny default)
+
+;; ---------------------------------------------------------------------------
+;; 10-system-runtime.sb influence: system binaries, runtime frameworks, process
+;; execution, temp/dev paths, and baseline macOS services.
+;; Narrowed /opt to /opt/homebrew for this host.
+;; ---------------------------------------------------------------------------
+
+(allow file-read*
+    (literal "/")
+    (literal "/usr")
+    (subpath "/usr")
+    (literal "/bin")
+    (subpath "/bin")
+    (literal "/sbin")
+    (subpath "/sbin")
+    (literal "/opt")
+    (literal "/opt/homebrew")
+    (subpath "/opt/homebrew")
+    (subpath "/System/Library")
+    (subpath "/System/Volumes/Preboot")
+    (subpath "/Library/Apple")
+    (subpath "/Library/Frameworks")
+    (subpath "/Library/Fonts")
+    (subpath "/Library/Filesystems/NetFSPlugins")
+    (subpath "/Library/Preferences/Logging")
+    (literal "/Library/Preferences/.GlobalPreferences.plist")
+    (literal "/Library/Preferences/com.apple.networkd.plist")
+    (literal "/dev")
+)
+
+(allow file-read-metadata
+    (subpath "/System")
+    (subpath "/private/var/run")
+    (literal "/home")
+    (literal "/private/etc")
+    (subpath "/dev")
+)
+
+(allow file-read*
+    (literal "/private")
+    (literal "/private/var")
+    (subpath "/private/var/db/timezone")
+    (literal "/private/var/select/sh")
+    (literal "/private/var/select/developer_dir")
+    (literal "/var/select/developer_dir")
+    (literal "/private/var/db/xcode_select_link")
+    (literal "/var/db/xcode_select_link")
+    (literal "/private/etc/hosts")
+    (literal "/private/etc/resolv.conf")
+    (literal "/private/var/run/resolv.conf")
+    (literal "/var/run/resolv.conf")
+    (literal "/private/etc/services")
+    (literal "/private/etc/protocols")
+    (literal "/private/etc/shells")
+    (subpath "/private/etc/ssl")
+    (literal "/private/etc/localtime")
+    (literal "/etc")
+    (literal "/var")
+)
+
+(allow file-read*
+    (home-prefix "/Library/Preferences/.GlobalPreferences")
+    (home-prefix "/Library/Preferences/com.apple.GlobalPreferences")
+    (home-subpath "/Library/Preferences/ByHost")
+    (home-literal "/.CFUserTextEncoding")
+)
+
+(allow process-exec)
+(allow process-fork)
+(allow sysctl-read)
+(allow process-info* (target same-sandbox))
+(allow signal (target same-sandbox))
+(allow mach-priv-task-port (target same-sandbox))
+(allow pseudo-tty)
+
+(allow file-read* file-write*
+    (subpath "/tmp")
+    (subpath "/private/tmp")
+    (subpath "/var/folders")
+    (subpath "/private/var/folders")
+)
+
+(deny file-read* file-write*
+    (regex #"^/private/tmp/com\.apple\.launchd\.[^/]+/Listeners$")
+    (regex #"^/tmp/com\.apple\.launchd\.[^/]+/Listeners$")
+)
+
+(allow file-read* file-write*
+    (subpath "/dev/fd")
+    (literal "/dev/stdout")
+    (literal "/dev/stderr")
+    (literal "/dev/null")
+    (literal "/dev/tty")
+    (literal "/dev/ptmx")
+    (literal "/dev/dtracehelper")
+    (regex #"^/dev/tty")
+    (regex #"^/dev/ttys")
+    (regex #"^/dev/pty")
+)
+
+(allow file-read*
+    (literal "/dev/zero")
+    (literal "/dev/autofs_nowait")
+    (literal "/dev/dtracehelper")
+    (literal "/dev/urandom")
+    (literal "/dev/random")
+)
+
+(allow file-ioctl
+    (literal "/dev/dtracehelper")
+    (literal "/dev/tty")
+    (literal "/dev/ptmx")
+    (regex #"^/dev/tty")
+    (regex #"^/dev/ttys")
+    (regex #"^/dev/pty")
+)
+
+(allow mach-lookup
+    (global-name "com.apple.system.notification_center")
+    (global-name "com.apple.opendirectoryd.libinfo")
+    (global-name "com.apple.logd")
+    (global-name "com.apple.FSEvents")
+    (global-name "com.apple.SystemConfiguration.configd")
+    (global-name "com.apple.SystemConfiguration.DNSConfiguration")
+    (global-name "com.apple.trustd.agent")
+    (global-name "com.apple.diagnosticd")
+    (global-name "com.apple.analyticsd")
+    (global-name "com.apple.dnssd.service")
+    (global-name "com.apple.CoreServices.coreservicesd")
+    (global-name "com.apple.DiskArbitration.diskarbitrationd")
+    (global-name "com.apple.analyticsd.messagetracer")
+    (global-name "com.apple.system.logger")
+    (global-name "com.apple.coreservices.launchservicesd")
+)
+
+(allow system-socket)
+
+(allow ipc-posix-shm-read-data
+    (ipc-posix-name "apple.shm.notification_center")
+)
+
+;; ---------------------------------------------------------------------------
+;; HOME ancestor literals.
+;; Safehouse render.sh influence: emit_path_ancestor_literals() grants literal
+;; read access to ancestor directories without granting recursive HOME access.
+;; ---------------------------------------------------------------------------
+
+(allow file-read*
+    (literal "/")
+    (literal "/Users")
+    (literal "{{ .chezmoi.homeDir }}")
+    (literal "{{ .chezmoi.homeDir }}/repos")
+    (literal "{{ .chezmoi.homeDir }}/.config")
+    (literal "{{ .chezmoi.homeDir }}/.config/opencode")
+    (literal "{{ .chezmoi.homeDir }}/.cache")
+    (literal "{{ .chezmoi.homeDir }}/.cache/opencode")
+    (literal "{{ .chezmoi.homeDir }}/.cache/opencode-ast")
+    (literal "{{ .chezmoi.homeDir }}/.cache/uv")
+    (literal "{{ .chezmoi.homeDir }}/.cache/mise")
+    (literal "{{ .chezmoi.homeDir }}/.cache/packer")
+    (literal "{{ .chezmoi.homeDir }}/.cache/pnpm")
+    (literal "{{ .chezmoi.homeDir }}/.local")
+    (literal "{{ .chezmoi.homeDir }}/.local/share")
+    (literal "{{ .chezmoi.homeDir }}/.local/share/opencode")
+    (literal "{{ .chezmoi.homeDir }}/.local/share/opentui")
+    (literal "{{ .chezmoi.homeDir }}/.local/share/uv")
+    (literal "{{ .chezmoi.homeDir }}/.local/share/mise")
+    (literal "{{ .chezmoi.homeDir }}/.local/share/pnpm")
+    (literal "{{ .chezmoi.homeDir }}/.npm")
+    (literal "{{ .chezmoi.homeDir }}/go")
+    (literal "{{ .chezmoi.homeDir }}/Library")
+    (literal "{{ .chezmoi.homeDir }}/Library/Caches")
+    (literal "{{ .chezmoi.homeDir }}/.ssh")
+)
+
+;; ---------------------------------------------------------------------------
+;; 20-network.sb influence: network is open for agent/API/package workflows.
+;; SSH agent and container daemon sockets are denied later.
+;; ---------------------------------------------------------------------------
+
+(allow network*)
+
+;; ---------------------------------------------------------------------------
+;; 30-toolchains/apple-toolchain-core.sb influence.
+;; Curated Apple CLT read-only surface. Debugger/Xcode GUI support is not added.
+;; ---------------------------------------------------------------------------
+
+(allow file-read*
+    ;; Ancestor directory literals required for clang/xcode tool discovery.
+    (literal "/Library")
+    (literal "/Library/Developer")
+    (literal "/Library/Developer/CommandLineTools")
+    (literal "/Library/Developer/CommandLineTools/usr")
+    (literal "/Library/Developer/CommandLineTools/usr/bin")
+    (literal "/Library/Developer/CommandLineTools/usr/include")
+    (literal "/Library/Developer/CommandLineTools/usr/lib")
+    (literal "/Library/Developer/CommandLineTools/usr/libexec")
+    (literal "/Library/Developer/CommandLineTools/usr/libexec/git-core")
+    (literal "/Library/Developer/CommandLineTools/usr/share")
+    (literal "/Library/Developer/CommandLineTools/SDKs")
+
+    ;; Narrow read-only CLT subtrees used by clang, linkers, git helpers, and SDK lookup.
+    (subpath "/Library/Developer/CommandLineTools/usr/bin")
+    (subpath "/Library/Developer/CommandLineTools/usr/include")
+    (subpath "/Library/Developer/CommandLineTools/usr/lib")
+    (subpath "/Library/Developer/CommandLineTools/usr/libexec/git-core")
+    (subpath "/Library/Developer/CommandLineTools/usr/share")
+    (subpath "/Library/Developer/CommandLineTools/SDKs")
+)
+
+;; ---------------------------------------------------------------------------
+;; 30-toolchains/node.sb influence.
+;; Narrowed to detected npm/pnpm cache locations. No global npmrc/yarnrc found.
+;; ---------------------------------------------------------------------------
+
+(allow file-read* file-write*
+    (home-subpath "/.npm")
+    (home-subpath "/.cache/pnpm")
+    (home-subpath "/.local/share/pnpm")
+)
+
+;; ---------------------------------------------------------------------------
+;; 30-toolchains/python.sb influence.
+;; Python itself is under Homebrew/system reads. These are narrow cache grants.
+;; Includes uv/uvx cache and tool state used by MCP servers launched with uvx.
+;; ---------------------------------------------------------------------------
+
+(allow file-read* file-write*
+    (home-subpath "/.cache/uv")
+    (home-subpath "/.local/share/uv")
+    (home-subpath "/.local/state/uv")
+    (home-subpath "/Library/Caches/uv")
+    (home-subpath "/.config/uv")
+    (home-subpath "/.cache/pip")
+    (home-subpath "/Library/Caches/pip")
+)
+
+;; ---------------------------------------------------------------------------
+;; 30-toolchains/go.sb influence.
+;; Detected GOPATH-style ~/go plus common Go and golangci-lint caches.
+;; ---------------------------------------------------------------------------
+
+(allow file-read* file-write*
+    (home-subpath "/go")
+    (home-subpath "/.cache/go-build")
+    (home-subpath "/Library/Caches/go-build")
+    (home-subpath "/.cache/golangci-lint")
+    (home-subpath "/Library/Caches/golangci-lint")
+    (home-subpath "/.cache/gopls")
+)
+
+;; ---------------------------------------------------------------------------
+;; 30-toolchains/runtime-managers.sb influence.
+;; Detected mise. Kept to mise-specific paths.
+;; ---------------------------------------------------------------------------
+
+(allow file-read* file-write*
+    (home-subpath "/.cache/mise")
+    (home-subpath "/.local/share/mise")
+    (home-subpath "/Library/Caches/mise")
+)
+
+;; Detected Packer cache, kept tool-specific and not broadened to all ~/.cache.
+(allow file-read* file-write*
+    (home-subpath "/.cache/packer")
+)
+
+;; ---------------------------------------------------------------------------
+;; 40-shared/agent-common.sb influence.
+;; No broad ~/.agents, ~/.skills, ~/.claude grants were detected or requested.
+;; openCode-specific agent/config state is granted in the 60-agents section.
+;; ---------------------------------------------------------------------------
+
+;; ---------------------------------------------------------------------------
+;; 50-integrations-core/git.sb influence.
+;; Minimal explicit global Git state. SSH private keys and agent are not granted.
+;; ---------------------------------------------------------------------------
+
+(allow file-read*
+    (home-literal "/.gitconfig")
+    (home-literal "/.gitconfig.local")
+    (home-literal "/.ssh")
+    (home-literal "/.ssh/known_hosts")
+)
+
+;; 50-integrations-core/container-runtime-default-deny.sb influence.
+(deny file-read* file-write*
+    (literal "/var/run/docker.sock")
+    (literal "/private/var/run/docker.sock")
+    (literal "/var/run/podman/podman.sock")
+    (literal "/private/var/run/podman.sock")
+    (home-literal "/.docker/run/docker.sock")
+    (home-literal "/.rd/docker.sock")
+    (home-literal "/.orbstack/run/docker.sock")
+    (regex (string-append "^" HOME_DIR "/\\.colima/docker\\.sock$"))
+    (regex (string-append "^" HOME_DIR "/\\.colima/[^/]+/docker\\.sock$"))
+)
+
+(deny network-outbound
+    (remote unix-socket (path-literal "/var/run/docker.sock"))
+    (remote unix-socket (path-literal "/private/var/run/docker.sock"))
+    (remote unix-socket (path-literal "/var/run/podman/podman.sock"))
+    (remote unix-socket (path-literal "/private/var/run/podman.sock"))
+    (remote unix-socket (path-regex (string-append "^" HOME_DIR "/\\.docker/run/docker\\.sock$")))
+    (remote unix-socket (path-regex (string-append "^" HOME_DIR "/\\.rd/docker\\.sock$")))
+    (remote unix-socket (path-regex (string-append "^" HOME_DIR "/\\.orbstack/run/docker\\.sock$")))
+    (remote unix-socket (path-regex (string-append "^" HOME_DIR "/\\.colima/docker\\.sock$")))
+    (remote unix-socket (path-regex (string-append "^" HOME_DIR "/\\.colima/[^/]+/docker\\.sock$")))
+)
+
+;; 50-integrations-core/ssh-agent-default-deny.sb influence.
+(deny network-outbound
+    (remote unix-socket (path-regex #"^/private/tmp/com\.apple\.launchd\.[^/]+/Listeners$"))
+    (remote unix-socket (path-regex #"^/tmp/com\.apple\.launchd\.[^/]+/Listeners$"))
+    (remote unix-socket (path-regex (string-append "^" HOME_DIR "/\\.ssh/agent(/.*)?$")))
+)
+
+;; ---------------------------------------------------------------------------
+;; 55-integrations-optional.
+;; Not enabled: shell-init, cloud-credentials, docker, kubectl, keychain, VS Code.
+;; This intentionally avoids ~/.zshrc, ~/.config/gcloud, ~/.terraform.d,
+;; ~/.docker, SSH private keys, and desktop-app state.
+;; ---------------------------------------------------------------------------
+
+;; 55-integrations-optional/clipboard.sb influence.
+;; Enables macOS pbcopy/pbpaste without granting broader desktop-app state.
+(allow mach-lookup
+    (global-name "com.apple.pasteboard.1")
+    (global-name "com.apple.lsd.mapdb")
+    (global-name "com.apple.lsd.modifydb")
+)
+
+;; ---------------------------------------------------------------------------
+;; 60-agents/opencode.sb influence.
+;; Detected openCode. Kept to openCode paths present on this host.
+;; GitHub Copilot token reads from Safehouse opencode.sb are omitted because
+;; ~/.config/github-copilot was not detected or requested.
+;; ---------------------------------------------------------------------------
+
+(allow file-read* file-write*
+    (home-subpath "/.config/opencode")
+    (home-subpath "/.cache/opencode")
+    (home-subpath "/.cache/opencode-ast")
+    (home-subpath "/.local/share/opencode")
+    (home-subpath "/.local/share/opentui")
+    (home-subpath "/.local/state/opencode")
+    (home-subpath "/.opencode")
+    (home-literal "/.opencode.json")
+)
+
+;; ---------------------------------------------------------------------------
+;; 65-apps.
+;; Not enabled: VS Code, Claude Desktop, Codex Desktop.
+;; ---------------------------------------------------------------------------
+
+;; ---------------------------------------------------------------------------
+;; Explicit project grant selected by user: all ~/repos read/write.
+;; Includes Safehouse-style ancestor literals above.
+;; ---------------------------------------------------------------------------
+
+(allow file-read* file-write*
+    (subpath "{{ .chezmoi.homeDir }}/repos")
+)
+
+;; ---------------------------------------------------------------------------
+;; Final sensitive denies.
+;; These are intentionally repeated at the end so accidental broader grants do
+;; not expose credential stores. The wrapper repeats them after dynamic grants.
+;; ---------------------------------------------------------------------------
+
+(deny file-read* file-write*
+    (home-subpath "/.ssh/agent")
+    (home-prefix "/.ssh/id_")
+    (home-literal "/.ssh/config")
+    (home-subpath "/.docker")
+    (home-subpath "/.terraform.d")
+    (home-subpath "/.config/gcloud")
+    (home-subpath "/.gsutil")
+)

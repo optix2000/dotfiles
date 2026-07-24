@@ -16,6 +16,20 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   elif [[ -x /usr/local/bin/brew ]]; then
     eval "$(/usr/local/bin/brew shellenv)"
   fi
+
+  export SAFE_AGENT_PROFILE="$HOME/.config/sandbox/agent-base.sb"
+
+  safe-agent() {
+    "$HOME/.config/sandbox/safe-agent" "$@"
+  }
+
+  safe-opencode() {
+    SAFE_OPENCODE_ALLOW_ALL="${SAFE_OPENCODE_ALLOW_ALL:-1}" safe-agent opencode "$@"
+  }
+
+  safe-opencode-docker() {
+    SAFE_OPENCODE_ALLOW_ALL="${SAFE_OPENCODE_ALLOW_ALL:-1}" safe-agent --enable=docker opencode "$@"
+  }
 fi
 
 znap source ohmyzsh/ohmyzsh plugins/terraform
