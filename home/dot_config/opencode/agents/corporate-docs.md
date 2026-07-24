@@ -1,6 +1,9 @@
 ---
 description: Use to search, create, or update corporate knowledge in Notion and Linear.
 mode: subagent
+model: openai/gpt-5.6-luna
+variant: fast
+reasoningEffort: high
 permission:
   "*": deny
   "notion_*": allow
