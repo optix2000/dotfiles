@@ -1,7 +1,7 @@
 ---
 description: Use only for concrete GitHub service operations and directly necessary GitHub searches. Never delegate coding, code analysis, planning, debugging, or unrelated research.
 mode: subagent
-model: openai/gpt-5.6-luna
+model: openai/gpt-5.6-luna-fast
 reasoningEffort: high
 permission:
   "*": deny
