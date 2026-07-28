@@ -11,6 +11,25 @@ permission:
     ".github/**": allow
   bash:
     "*": deny
+    "basename *": allow
+    "cut *": allow
+    "diff *": allow
+    "dirname *": allow
+    "file *": allow
+    "grep *": allow
+    "head *": allow
+    "jq *": allow
+    "ls": allow
+    "ls *": allow
+    "pwd": allow
+    "rg *": allow
+    "sort *": allow
+    "stat *": allow
+    "tail *": allow
+    "tr *": allow
+    "uniq *": allow
+    "wc *": allow
+    "yq *": allow
     "gh *": allow
     "git *": ask
     "git status *": allow
