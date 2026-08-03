@@ -10,8 +10,10 @@ literal = ["{{ .chezmoi.homeDir }}"]
 
 # Handle every filesystem operation known to ABI 6. Anything not allowed below
 # is denied, including writes to credential stores and Docker by default.
+# ABI 6-capable kernels limit signals and abstract Unix sockets to this sandbox.
 [[ruleset]]
 handled_access_fs = ["abi.all"]
+scoped = ["abi.all"]
 
 # Program binaries, dynamic libraries, package metadata, and system
 # configuration needed by language runtimes and package managers.

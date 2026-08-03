@@ -11,6 +11,17 @@ zsh
 vim or neovim
 ```
 
+Linux installs a pinned, statically linked `llconfig` sandbox launcher for
+`amd64` and `arm64` directly from this repository. Target machines do not need
+Rust or Cargo.
+
+Maintainers can rebuild both binaries from the pinned upstream source and
+digest-pinned musl toolchains with:
+
+```sh
+./scripts/build-llconfig-binaries.sh
+```
+
 ## Install
 
 Install `chezmoi` with your OS package manager, then apply this repo:

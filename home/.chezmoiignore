@@ -3,6 +3,15 @@
 {{- end }}
 {{- if ne .chezmoi.os "linux" }}
 .config/landlock
+.local/bin/llconfig
+.local/libexec/llconfig
+{{- else }}
+{{- if ne .chezmoi.arch "amd64" }}
+.local/libexec/llconfig/llconfig-linux-amd64
+{{- end }}
+{{- if ne .chezmoi.arch "arm64" }}
+.local/libexec/llconfig/llconfig-linux-arm64
+{{- end }}
 {{- end }}
 {{- if and (ne .chezmoi.os "darwin") (ne .chezmoi.os "linux") }}
 .local/bin/safe-agent

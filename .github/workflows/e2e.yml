@@ -15,6 +15,56 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  llconfig-reproducible:
+    name: Rebuild llconfig binaries
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Rebuild pinned binaries
+        run: |
+          ./scripts/build-llconfig-binaries.sh
+          git diff --exit-code -- \
+            home/dot_local/libexec/llconfig
+
+  llconfig-arm64:
+    name: Verify llconfig on arm64
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install chezmoi
+        run: |
+          mkdir -p "$RUNNER_TEMP/bin"
+          curl -fsSLo "$RUNNER_TEMP/chezmoi.tar.gz" \
+            "https://github.com/twpayne/chezmoi/releases/download/v2.70.5/chezmoi_2.70.5_linux_arm64.tar.gz"
+          tar -xzf "$RUNNER_TEMP/chezmoi.tar.gz" -C "$RUNNER_TEMP/bin" chezmoi
+
+      - name: Apply and verify arm64 launcher
+        run: |
+          export HOME="$RUNNER_TEMP/home"
+          mkdir -p "$HOME/repos/e2e"
+
+          "$RUNNER_TEMP/bin/chezmoi" \
+            --source="$GITHUB_WORKSPACE" \
+            --destination="$HOME" \
+            apply --exclude=scripts,externals
+
+          test -x "$HOME/.local/bin/llconfig"
+          test -x "$HOME/.local/libexec/llconfig/llconfig-linux-arm64"
+          test ! -e "$HOME/.local/libexec/llconfig/llconfig-linux-amd64"
+          case "$("$HOME/.local/bin/llconfig" --version)" in
+            *bdffdcd14e6c*) ;;
+            *) printf "unexpected llconfig revision\n" >&2; exit 1 ;;
+          esac
+          "$HOME/.local/bin/safe-agent" --workdir="$HOME/repos/e2e" true
+
   chezmoi:
     name: Chezmoi apply and verify
     runs-on: ubuntu-latest
@@ -32,6 +82,7 @@ jobs:
           docker run --rm --volume "$PWD:/home/user/dotfiles:ro" dotfiles/base bash -euxo pipefail -c '
             export CHEZMOI_SKIP_VIM_PLUG=1
 
+            ! command -v cargo
             chezmoi --source=/home/user/dotfiles --destination=/home/user apply --refresh-externals
             chezmoi --source=/home/user/dotfiles --destination=/home/user verify --exclude=scripts,externals
 
@@ -39,6 +90,10 @@ jobs:
             test -f "$HOME/.vimrc"
             test -f "$HOME/.config/opencode/opencode.jsonc"
             test -f "$HOME/.gitconfig"
+            test -x "$HOME/.local/bin/llconfig"
+            test -x "$HOME/.local/bin/safe-agent"
+            test -x "$HOME/.local/libexec/llconfig/llconfig-linux-amd64"
+            test ! -e "$HOME/.local/libexec/llconfig/llconfig-linux-arm64"
 
             test -d "$HOME/.zsh/cache"
             test -d "$HOME/.zsh/zsh-snap/.git"
@@ -54,6 +109,32 @@ jobs:
             zsh -n "$HOME/.zshrc"
             zsh -n "$HOME/.zshrc.pre"
             zsh -n "$HOME/.zshrc.local"
+            bash -n "$HOME/.local/bin/safe-agent"
+
+            case "$("$HOME/.local/bin/llconfig" --version)" in
+              *bdffdcd14e6c*) ;;
+              *) printf "unexpected llconfig revision\n" >&2; exit 1 ;;
+            esac
+            "$HOME/.local/bin/llconfig" schema >/dev/null
+            "$HOME/.local/bin/safe-agent" --help
+
+            mkdir -p "$HOME/repos/e2e"
+            "$HOME/.local/bin/safe-agent" --workdir="$HOME/repos/e2e" true
+            SAFE_AGENT_E2E=present "$HOME/.local/bin/safe-agent" \
+              --workdir="$HOME/repos/e2e" sh -c "test \"\$SAFE_AGENT_E2E\" = present"
+
+            mkdir -p "$HOME/.ssh"
+            printf "sensitive\n" >"$HOME/.ssh/id_e2e"
+            if "$HOME/.local/bin/safe-agent" --workdir="$HOME/repos/e2e" \
+              cat "$HOME/.ssh/id_e2e" >/dev/null 2>&1; then
+              printf "safe-agent exposed a protected credential file\n" >&2
+              exit 1
+            fi
+
+            if "$HOME/.local/bin/safe-agent" --workdir="$HOME" true; then
+              printf "safe-agent accepted a workdir containing credential paths\n" >&2
+              exit 1
+            fi
 
             printf "e2e assertions passed\n"
           '

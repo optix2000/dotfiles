@@ -115,6 +115,46 @@ escape_toml() {
   printf '%s' "$s"
 }
 
+# Return success when candidate is parent itself or one of its descendants.
+is_same_or_descendant() {
+  local candidate="$1"
+  local parent="$2"
+
+  if [[ "$parent" == "/" ]]; then
+    [[ "$candidate" == /* ]]
+  else
+    [[ "$candidate" == "$parent" || "$candidate" == "$parent/"* ]]
+  fi
+}
+
+# Reject broad grants that would contain or enter a protected credential tree.
+validate_landlock_workdir() {
+  local workdir="$1"
+  local docker_enabled="$2"
+  local home_physical protected
+  local -a protected_paths
+
+  home_physical="$(cd "$HOME" && pwd -P)"
+  protected_paths=(
+    "$home_physical/.ssh"
+    "$home_physical/.terraform.d"
+    "$home_physical/.config/gcloud"
+    "$home_physical/.gsutil"
+  )
+  if [[ "$docker_enabled" != "1" ]]; then
+    protected_paths+=("$home_physical/.docker")
+  fi
+
+  # Landlock cannot subtract a sensitive child from a broader workdir grant.
+  for protected in "${protected_paths[@]}"; do
+    if is_same_or_descendant "$workdir" "$protected" ||
+       is_same_or_descendant "$protected" "$workdir"; then
+      printf 'safe-agent: workdir would expose protected path: %s\n' "$protected" >&2
+      exit 77
+    fi
+  done
+}
+
 emit_ancestor_literals() {
   local path="$1"
   local label="$2"
@@ -217,10 +257,13 @@ case "$(uname -s)" in
     exec /usr/bin/sandbox-exec -f "$tmp_profile" "$@"
     ;;
   Linux)
-    if ! command -v llconfig >/dev/null 2>&1; then
-      printf '%s\n' 'safe-agent: llconfig is required on Linux; install landlockconfig.' >&2
+    LLCONFIG_BIN="$HOME/.local/bin/llconfig"
+    if [[ ! -x "$LLCONFIG_BIN" ]]; then
+      printf '%s\n' 'safe-agent: managed llconfig is required on Linux; run chezmoi apply.' >&2
       exit 69
     fi
+
+    validate_landlock_workdir "$WORKDIR" "$ENABLE_DOCKER"
 
     tmp_profile="$(mktemp "${TMPDIR:-/tmp}/safe-agent.XXXXXX.toml")"
     trap 'rm -f "$tmp_profile"' EXIT INT TERM
@@ -242,6 +285,6 @@ case "$(uname -s)" in
       fi
     } > "$tmp_profile"
 
-    exec llconfig run --toml "$PROFILE" --toml "$tmp_profile" -- "$@"
+    exec "$LLCONFIG_BIN" run --toml "$PROFILE" --toml "$tmp_profile" -- "$@"
     ;;
 esac
