@@ -16,7 +16,8 @@ handled_access_fs = ["abi.all"]
 scoped = ["abi.all"]
 
 # Program binaries, dynamic libraries, package metadata, and system
-# configuration needed by language runtimes and package managers.
+# configuration needed by language runtimes and package managers. WSL's
+# /etc/resolv.conf resolves outside /etc, so grant its exact target there.
 [[path_beneath]]
 allowed_access = ["abi.read_execute"]
 parent = [
@@ -29,6 +30,9 @@ parent = [
     "/etc",
     "/proc",
     "/sys",
+{{ if and (eq .chezmoi.os "linux") (.chezmoi.kernel.osrelease | lower | contains "microsoft") (stat "/mnt/wsl/resolv.conf") }}
+    "/mnt/wsl/resolv.conf",
+{{ end }}
 ]
 
 # Shell I/O and scratch locations.
