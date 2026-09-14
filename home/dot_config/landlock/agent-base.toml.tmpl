@@ -92,12 +92,13 @@ parent = [
 allowed_access = ["abi.read_write"]
 parent = ["${home}/repos"]
 
-# Git can read its configuration and host verification data but cannot access
-# private keys, SSH configuration, cloud credentials, or Docker state.
+# Git and GitHub CLI can read their configuration and host verification data
+# but cannot access private keys, SSH configuration, cloud credentials, or Docker state.
 [[path_beneath]]
 allowed_access = ["abi.read_execute"]
 parent = [
     "${home}/.gitconfig",
     "${home}/.gitconfig.local",
+    "${home}/.config/gh",
     "${home}/.ssh/known_hosts",
 ]

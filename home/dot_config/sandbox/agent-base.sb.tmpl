@@ -291,12 +291,14 @@
 
 ;; ---------------------------------------------------------------------------
 ;; 50-integrations-core/git.sb influence.
-;; Minimal explicit global Git state. SSH private keys and agent are not granted.
+;; Minimal explicit global Git and GitHub CLI state. SSH private keys and agent
+;; are not granted.
 ;; ---------------------------------------------------------------------------
 
 (allow file-read*
     (home-literal "/.gitconfig")
     (home-literal "/.gitconfig.local")
+    (home-subpath "/.config/gh")
     (home-literal "/.ssh")
     (home-literal "/.ssh/known_hosts")
 )
