@@ -1,3 +1,13 @@
+{{- /* Keep machine-local plugin entries outside the managed source state. */ -}}
+{{- $localPluginsPath := joinPath .chezmoi.destDir ".config/opencode/plugins.local.json" -}}
+{{- $localPlugins := list -}}
+{{- if stat $localPluginsPath -}}
+{{- $localConfig := include $localPluginsPath | fromJson -}}
+{{- if not (kindIs "slice" $localConfig.plugins) -}}
+{{- fail "plugins.local.json must contain a plugins array" -}}
+{{- end -}}
+{{- $localPlugins = $localConfig.plugins -}}
+{{- end -}}
 {
   "$schema": "https://raw.githubusercontent.com/optix2000/opencode-plugin-manager/main/plugins.schema.json",
   "autoinstall": true,
@@ -26,6 +36,7 @@
     {
       "source": "git",
       "repo": "https://github.com/optix2000/opencode-agent-instructions.git"
-    }
+    }{{ range $localPlugins }},
+{{ . | toPrettyJson | trim | indent 4 }}{{ end }}
   ]
 }

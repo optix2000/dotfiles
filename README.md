@@ -46,3 +46,38 @@ chezmoi update --refresh-externals
 ```
 
 Set `CHEZMOI_SKIP_VIM_PLUG=1` before applying if you want to skip the Vim plugin update script.
+
+## OpenCode
+
+The managed MCP fragments require `sem` on `PATH` and `GITHUB_TOKEN` in
+OpenCode's environment. Grafana remains disabled; when enabled, it also uses
+`GRAFANA_URL` and `GRAFANA_SERVICE_ACCOUNT_TOKEN`. Set these variables before
+applying the fragments over existing credential-bearing configuration.
+
+Machine-local provider settings, such as MLX, can remain in the unmanaged
+`~/.config/opencode/config.d/local.jsonc` file.
+
+For machine-local plugins, create `~/.config/opencode/plugins.local.json`
+with a `plugins` array. For example:
+
+```json
+{
+  "plugins": [
+    {
+      "source": "local",
+      "path": "~/repos/opencode-e2b",
+      "entry": "./src/index.ts"
+    }
+  ]
+}
+```
+
+Chezmoi appends these entries to the portable defaults when rendering
+`plugins.jsonc`. The local manifest must be valid JSON and remains outside
+the repository. Apply changes to it with:
+
+```sh
+chezmoi apply ~/.config/opencode/plugins.jsonc
+```
+
+Restart OpenCode after applying configuration changes.

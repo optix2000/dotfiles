@@ -1,0 +1,9 @@
+{
+  "mcp": {
+    "sem": {
+      "type": "local",
+      "command": ["sem", "mcp"],
+      "enabled": true
+    }
+  }
+}
