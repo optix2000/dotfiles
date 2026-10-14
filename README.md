@@ -46,3 +46,10 @@ chezmoi update --refresh-externals
 ```
 
 Set `CHEZMOI_SKIP_VIM_PLUG=1` before applying if you want to skip the Vim plugin update script.
+
+## OpenCode
+
+Requires `sem` on `PATH`. Export `GITHUB_TOKEN` before starting OpenCode to
+use GitHub MCP.
+
+Keep machine-local providers in `~/.config/opencode/config.d/local.jsonc`.
