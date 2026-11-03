@@ -89,6 +89,10 @@ jobs:
             test -f "$HOME/.zshrc"
             test -f "$HOME/.vimrc"
             test -f "$HOME/.config/opencode/opencode.jsonc"
+            test ! -e "$HOME/.config/opencode/cli.json"
+            bash /home/user/dotfiles/scripts/test-opencode-config.sh
+            bash /home/user/dotfiles/scripts/test-safe-opencode.sh
+            bash /home/user/dotfiles/scripts/test-hindsight-sandbox.sh
             test -f "$HOME/.gitconfig"
             test -x "$HOME/.local/bin/llconfig"
             test -x "$HOME/.local/bin/safe-agent"

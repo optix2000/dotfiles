@@ -289,6 +289,19 @@
 ;; openCode-specific agent/config state is granted in the 60-agents section.
 ;; ---------------------------------------------------------------------------
 
+;; OpenCode V2 probes optional config paths and VCS markers at every ancestor.
+;; Denied stat/realpath calls abort startup rather than treating paths as absent.
+;; Only marker metadata and compatibility-directory entries are readable here;
+;; parent project files, Git objects, and Claude history/credentials stay denied.
+(allow file-read-metadata
+    (regex #"^/(.*/)?(\.git|\.hg)$")
+    (regex #"^/(.*/)?(\.claude|\.agents|\.opencode)(/.*)?$")
+    (regex #"^/(.*/)?opencode\.jsonc?$")
+)
+(allow file-read-data
+    (regex #"^/(.*/)?(\.claude|\.agents|\.opencode)$")
+)
+
 ;; ---------------------------------------------------------------------------
 ;; 50-integrations-core/git.sb influence.
 ;; Minimal explicit global Git and GitHub CLI state. SSH private keys and agent
@@ -366,6 +379,19 @@
     (home-subpath "/.local/state/opencode")
     (home-subpath "/.opencode")
     (home-literal "/.opencode.json")
+)
+
+;; Hindsight's native OpenCode plugin reads its endpoint/token configuration.
+;; Keep that exact file read-only and permit only ancestor metadata, not sibling
+;; contents or the staged runtime. Only the named log tree is writable.
+(allow file-read-metadata
+    (home-literal "/.hindsight")
+)
+(allow file-read*
+    (home-literal "/.hindsight/coding-agent.json")
+)
+(allow file-read* file-write*
+    (home-subpath "/.hindsight/coding-agents-logs")
 )
 
 ;; ---------------------------------------------------------------------------

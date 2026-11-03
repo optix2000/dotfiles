@@ -1,12 +1,10 @@
 {
-  "agent": {
+  "agents": {
     "explore": {
-      "model": "openai/gpt-6.1-sol",
-      "reasoningEffort": "high",
-      "include": ["reasoning.encrypted_content"],
-      "permission": {
-        "ast": "allow"
-      }
+      "model": "openai/gpt-6.1-terra#medium",
+      "permissions": [
+        { "action": "ast", "resource": "*", "effect": "allow" }
+      ]
     }
   }
 }

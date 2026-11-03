@@ -49,7 +49,24 @@ Set `CHEZMOI_SKIP_VIM_PLUG=1` before applying if you want to skip the Vim plugin
 
 ## OpenCode
 
-Requires `sem` on `PATH`. Export `GITHUB_TOKEN` before starting OpenCode to
-use GitHub MCP.
+Requires OpenCode 2.0.32 or newer and `sem` on `PATH`. Export `GITHUB_TOKEN`
+before starting OpenCode to use GitHub MCP. Sign into Linear and Notion through
+`/mcps`.
+
+Profiles default to `base` (GitHub, Context7, SEM). For Hindsight, Linear, Notion,
+and Grafana, set `profile = "work"` under `[data]` in `chezmoi edit-config` before
+applying. Grafana stays disabled by default. Profile switches must apply both
+`~/.config/opencode/opencode.jsonc` and `~/.config/opencode/config.d/grafana.jsonc`.
 
 Keep machine-local providers in `~/.config/opencode/config.d/local.jsonc`.
+
+Sandbox wrappers preserve approval prompts by default. Set
+`SAFE_OPENCODE_ALLOW_ALL=1` to opt into automatic approval.
+
+Run configuration and wrapper checks without changing the live setup:
+
+```sh
+./scripts/test-opencode-config.sh
+bash scripts/test-safe-opencode.sh
+bash scripts/test-hindsight-sandbox.sh
+```

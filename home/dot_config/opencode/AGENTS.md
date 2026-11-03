@@ -21,26 +21,6 @@ ALWAYS check if a virtualenv exists in the project folder or working directory a
 
 ---
 
-## GitHub Tool Preference
-
-When a task needs a concrete GitHub service operation, such as viewing, searching, creating, or updating a repository, issue, pull request, release, workflow run, or comment:
-
-1. Delegate only that GitHub operation to the `github` subagent.
-2. Keep the delegation prompt limited to the requested GitHub operation and its necessary resource details.
-3. Do not delegate coding, code review, source or repository-change analysis, debugging, planning, implementation decisions, or unrelated research to the `github` subagent. Perform that work in the calling agent or delegate it to an appropriate specialist.
-
-If you call out to a subagent or create a task, you MUST give it the same requirements above.
-
----
-
-## Corporate Knowledge Tool Preference
-
-When working with corporate knowledge in Notion or Linear:
-
-1. ALWAYS delegate the task to the `corporate-docs` subagent.
-
----
-
 ## Context7 for Library Documentation
 
 When working with common libraries or frameworks, use Context7 to fetch up-to-date documentation:

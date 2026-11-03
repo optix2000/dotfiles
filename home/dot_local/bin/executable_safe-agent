@@ -93,7 +93,8 @@ case "${SAFE_OPENCODE_ALLOW_ALL:-}" in
         printf 'safe-agent: OPENCODE_CONFIG_CONTENT is already set; refusing to override it\n' >&2
         exit 78
       fi
-      export OPENCODE_CONFIG_CONTENT='{"permission":"allow"}'
+      # Native V2 rules; client-side --auto handles remaining approval requests.
+      export OPENCODE_CONFIG_CONTENT='{"permissions":[{"action":"*","resource":"*","effect":"allow"}]}'
     fi
     ;;
 esac
@@ -155,6 +156,39 @@ validate_landlock_workdir() {
   done
 }
 
+# Landlock follows symlinks when opening rule roots and cannot subtract children.
+# Validate every Hindsight rule root for every command, not just OpenCode: a
+# config symlink to a directory would turn read_file into a subtree read grant.
+validate_hindsight_paths() {
+  local parent="$HOME/.hindsight"
+  local logs="$parent/coding-agents-logs"
+  local config="$parent/coding-agent.json"
+  local path
+
+  for path in "$parent" "$logs"; do
+    if [[ -L "$path" || ( -e "$path" && ! -d "$path" ) ]]; then
+      printf 'safe-agent: refusing unsafe Hindsight log directory: %s\n' "$path" >&2
+      exit 77
+    fi
+  done
+
+  if [[ -L "$config" || ( -e "$config" && ! -f "$config" ) ]]; then
+    printf 'safe-agent: refusing unsafe Hindsight config file: %s\n' "$config" >&2
+    exit 77
+  fi
+}
+
+# Landlock ignores missing rule roots and cannot create children of an ungranted
+# parent. Prepare only the native plugin log tree; preserve config/existing modes.
+prepare_hindsight_logs() {
+  local logs="$HOME/.hindsight/coding-agents-logs"
+
+  if ! (umask 077; mkdir -p -- "$logs"); then
+    printf 'safe-agent: cannot prepare Hindsight log directory: %s\n' "$logs" >&2
+    exit 73
+  fi
+}
+
 emit_ancestor_literals() {
   local path="$1"
   local label="$2"
@@ -175,22 +209,6 @@ emit_ancestor_literals() {
   done
 
   printf ')\n'
-}
-
-emit_path_grant() {
-  local mode="$1"
-  local path="$2"
-  local label="$3"
-  local escaped
-
-  emit_ancestor_literals "$path" "$label"
-  escaped="$(escape_sb "$path")"
-
-  if [[ -d "$path" ]]; then
-    printf '(allow %s (subpath "%s"))\n' "$mode" "$escaped"
-  else
-    printf '(allow %s (literal "%s"))\n' "$mode" "$escaped"
-  fi
 }
 
 emit_docker_integration() {
@@ -247,7 +265,8 @@ case "$(uname -s)" in
       printf ';; Runtime workdir grant from safe-agent wrapper.\n'
       printf ';; Invocation directory resolved with pwd -P: %s\n' "$(escape_sb "$WORKDIR")"
       printf ';; ---------------------------------------------------------------------------\n'
-      emit_path_grant "file-read* file-write*" "$WORKDIR" "invocation workdir"
+      emit_ancestor_literals "$WORKDIR" "invocation workdir"
+      printf '(allow file-read* file-write* (subpath "%s"))\n' "$(escape_sb "$WORKDIR")"
       if [[ "$ENABLE_DOCKER" == "1" ]]; then
         emit_docker_integration
       fi
@@ -264,6 +283,12 @@ case "$(uname -s)" in
     fi
 
     validate_landlock_workdir "$WORKDIR" "$ENABLE_DOCKER"
+    validate_hindsight_paths
+
+    if [[ "$COMMAND_BASENAME" == "opencode" ]]; then
+      prepare_hindsight_logs
+      validate_hindsight_paths
+    fi
 
     tmp_profile="$(mktemp "${TMPDIR:-/tmp}/safe-agent.XXXXXX.toml")"
     trap 'rm -f "$tmp_profile"' EXIT INT TERM

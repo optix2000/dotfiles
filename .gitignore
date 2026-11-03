@@ -1,0 +1,3 @@
+# OpenCode credentials are machine-local, never part of the chezmoi source state.
+/home/dot_config/opencode/credentials/
+/home/dot_config/opencode/private_credentials/

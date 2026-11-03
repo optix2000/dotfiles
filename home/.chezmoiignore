@@ -16,3 +16,7 @@
 {{- if and (ne .chezmoi.os "darwin") (ne .chezmoi.os "linux") }}
 .local/bin/safe-agent
 {{- end }}
+
+# Keep authentication material outside chezmoi, even when adding the config tree.
+.config/opencode/credentials
+.config/opencode/credentials/**

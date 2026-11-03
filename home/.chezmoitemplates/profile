@@ -1,0 +1,11 @@
+{{- /* A machine-local selector shared by any dotfile that needs variants.
+     Existing machines without profile data get base; invalid values must not
+     silently fall back and accidentally remove work configuration. */ -}}
+{{- $profile := "base" -}}
+{{- if hasKey . "profile" -}}
+{{- $profile = get . "profile" -}}
+{{- end -}}
+{{- if not (and (kindIs "string" $profile) (or (eq $profile "base") (eq $profile "work"))) -}}
+{{- fail "profile must be either base or work" -}}
+{{- end -}}
+{{- $profile -}}

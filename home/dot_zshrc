@@ -19,30 +19,56 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 case "$OSTYPE" in
-  darwin*)
-  case ":$PATH:" in
-    *":$HOME/.local/bin:"*) ;;
-    *) export PATH="$HOME/.local/bin:$PATH" ;;
-  esac
-
-  export SAFE_AGENT_PROFILE="$HOME/.config/sandbox/agent-base.sb"
-  ;;
-  linux*)
-  case ":$PATH:" in
-    *":$HOME/.local/bin:"*) ;;
-    *) export PATH="$HOME/.local/bin:$PATH" ;;
-  esac
-
-  export SAFE_AGENT_PROFILE="$HOME/.config/landlock/agent-base.toml"
-  ;;
+  darwin*|linux*)
+    case ":$PATH:" in
+      *":$HOME/.local/bin:"*) ;;
+      *) export PATH="$HOME/.local/bin:$PATH" ;;
+    esac
+    ;;
 esac
 
 safe-opencode() {
-  SAFE_OPENCODE_ALLOW_ALL="${SAFE_OPENCODE_ALLOW_ALL:-1}" safe-agent opencode "$@"
+  # Always start a private server that inherits this invocation's sandbox.
+  case "${1:-}" in
+    service|serve|pair)
+      print -u2 'safe-opencode: shared-service commands are not allowed; use plain opencode outside the sandbox'
+      return 64
+      ;;
+  esac
+  local arg
+  for arg in "$@"; do
+    case "$arg" in
+      --server|--server=*|--standalone=*|--no-standalone)
+        print -u2 'safe-opencode: connecting to an external server or disabling standalone mode is not allowed'
+        return 64
+        ;;
+    esac
+  done
+
+  # OpenCode requires command-specific flags after the subcommand.
+  local command_mode="${1:-}"
+  local -a invocation=(opencode --standalone)
+  case "$command_mode" in
+    run|mini|api|acp)
+      invocation=(opencode "$1" --standalone)
+      shift
+      ;;
+  esac
+  # Autoapproval is opt-in; preserve configured ask prompts by default.
+  # --auto is a client setting; OS sandbox denials remain in force.
+  case "${SAFE_OPENCODE_ALLOW_ALL:-0}" in
+    1|true|TRUE|yes|YES|on|ON)
+      case "$command_mode" in
+        mini|api|acp) ;;
+        *) invocation+=(--auto) ;;
+      esac
+      ;;
+  esac
+  SAFE_OPENCODE_ALLOW_ALL="${SAFE_OPENCODE_ALLOW_ALL:-0}" safe-agent "${invocation[@]}" "$@"
 }
 
 safe-opencode-docker() {
-  SAFE_OPENCODE_ALLOW_ALL="${SAFE_OPENCODE_ALLOW_ALL:-1}" safe-agent --enable=docker opencode "$@"
+  SAFE_AGENT_ENABLE_DOCKER=1 safe-opencode "$@"
 }
 
 znap source ohmyzsh/ohmyzsh plugins/terraform

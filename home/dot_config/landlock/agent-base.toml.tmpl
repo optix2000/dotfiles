@@ -65,6 +65,17 @@ parent = [
     "${home}/.opencode.json",
 ]
 
+# Hindsight's native plugin needs its endpoint/token config, never config writes
+# or sibling state. Landlock does not require directory-read grants to traverse
+# ancestors. safe-agent prepares the log directory before OpenCode enters.
+[[path_beneath]]
+allowed_access = ["read_file"]
+parent = ["${home}/.hindsight/coding-agent.json"]
+
+[[path_beneath]]
+allowed_access = ["abi.read_write"]
+parent = ["${home}/.hindsight/coding-agents-logs"]
+
 [[path_beneath]]
 allowed_access = ["abi.read_execute"]
 parent = ["${home}/.local/bin"]
