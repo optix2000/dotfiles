@@ -80,9 +80,16 @@ assert_profile() {
   fi
 }
 
+# Retired managed files must disappear on upgrades, without removing GPT rules.
+mkdir -p "$CONFIG/provider-system-prompts"
+printf 'retired Opus rule\n' >"$CONFIG/provider-system-prompts/80-opus.md"
+printf 'retired plugin guide\n' >"$CONFIG/provider-system-prompts.md"
+
 # Both a missing profile and an explicit base select base.
 apply_opencode "$TEST_ROOT/default.toml"
 assert_profile base
+test ! -e "$CONFIG/provider-system-prompts/80-opus.md"
+test ! -e "$CONFIG/provider-system-prompts.md"
 test -s "$CONFIG/provider-system-prompts/80-openai.md"
 cp "$CONFIG/opencode.jsonc" "$TEST_ROOT/default.json"
 apply_opencode "$TEST_ROOT/base.toml"

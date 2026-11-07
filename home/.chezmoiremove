@@ -1,0 +1,3 @@
+# Retired managed prompt files; leave other instructions and local files alone.
+.config/opencode/provider-system-prompts/80-opus.md
+.config/opencode/provider-system-prompts.md
