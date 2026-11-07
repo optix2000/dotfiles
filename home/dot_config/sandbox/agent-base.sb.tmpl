@@ -381,6 +381,7 @@
     (home-literal "/.opencode.json")
 )
 
+{{ if eq (includeTemplate "profile" .) "work" }}
 ;; Hindsight's native OpenCode plugin reads its endpoint/token configuration.
 ;; Keep that exact file read-only and permit only ancestor metadata, not sibling
 ;; contents or the staged runtime. Only the named log tree is writable.
@@ -393,6 +394,7 @@
 (allow file-read* file-write*
     (home-subpath "/.hindsight/coding-agents-logs")
 )
+{{ end }}
 
 ;; ---------------------------------------------------------------------------
 ;; 65-apps.

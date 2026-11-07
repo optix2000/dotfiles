@@ -55,8 +55,10 @@ before starting OpenCode to use GitHub MCP. Sign into Linear and Notion through
 
 Profiles default to `base` (GitHub, Context7, SEM). For Hindsight, Linear, Notion,
 and Grafana, set `profile = "work"` under `[data]` in `chezmoi edit-config` before
-applying. Grafana stays disabled by default. Profile switches must apply both
-`~/.config/opencode/opencode.jsonc` and `~/.config/opencode/config.d/grafana.jsonc`.
+applying. Grafana stays disabled by default. Profile switches must reapply
+`~/.config/opencode/opencode.jsonc`, `~/.config/opencode/config.d/grafana.jsonc`,
+and the platform's `~/.config/sandbox/agent-base.sb` or
+`~/.config/landlock/agent-base.toml`.
 
 Keep machine-local providers in `~/.config/opencode/config.d/local.jsonc`.
 

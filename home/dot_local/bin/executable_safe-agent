@@ -283,11 +283,15 @@ case "$(uname -s)" in
     fi
 
     validate_landlock_workdir "$WORKDIR" "$ENABLE_DOCKER"
-    validate_hindsight_paths
 
-    if [[ "$COMMAND_BASENAME" == "opencode" ]]; then
-      prepare_hindsight_logs
+    # Follow Hindsight grants in the selected policy, including profile overrides.
+    # Base policies contain none, so leave even existing Hindsight state alone.
+    if grep -Fq '${home}/.hindsight/' "$PROFILE"; then
       validate_hindsight_paths
+      if [[ "$COMMAND_BASENAME" == "opencode" ]]; then
+        prepare_hindsight_logs
+        validate_hindsight_paths
+      fi
     fi
 
     tmp_profile="$(mktemp "${TMPDIR:-/tmp}/safe-agent.XXXXXX.toml")"

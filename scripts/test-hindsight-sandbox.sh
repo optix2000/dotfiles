@@ -32,11 +32,15 @@ trap cleanup EXIT
 # Render with synthetic template data, not the caller's home/config or secrets.
 render_profile() {
   local platform="$1" home="$2" source="$3" output="$4" escaped
+  local profile="${5:-work}" profile_data=""
+  if [[ "$profile" != default ]]; then
+    profile_data="\"profile\":\"$profile\","
+  fi
   escaped="${home//\\/\\\\}"
   escaped="${escaped//\"/\\\"}"
   chezmoi --source="$SOURCE_DIR" --config="$TEST_ROOT/chezmoi.toml" \
     --cache="$TEST_ROOT/cache" --persistent-state="$TEST_ROOT/chezmoi-state.boltdb" \
-    --override-data="{\"chezmoi\":{\"homeDir\":\"$escaped\",\"os\":\"$platform\",\"kernel\":{\"osrelease\":\"\"}}}" \
+    --override-data="{${profile_data}\"chezmoi\":{\"homeDir\":\"$escaped\",\"os\":\"$platform\",\"kernel\":{\"osrelease\":\"\"}}}" \
     execute-template < "$source" > "$output"
 }
 
@@ -44,6 +48,20 @@ render_profile darwin "$TEST_ROOT/fake-home" \
   "$SOURCE_DIR/home/dot_config/sandbox/agent-base.sb.tmpl" "$TEST_ROOT/profile.sb"
 render_profile linux "$TEST_ROOT/fake-home" \
   "$SOURCE_DIR/home/dot_config/landlock/agent-base.toml.tmpl" "$TEST_ROOT/profile.toml"
+
+# Explicit base and the missing-profile default must omit all Hindsight grants.
+for profile in base default; do
+  render_profile darwin "$TEST_ROOT/fake-home" \
+    "$SOURCE_DIR/home/dot_config/sandbox/agent-base.sb.tmpl" "$TEST_ROOT/$profile.sb" "$profile"
+  render_profile linux "$TEST_ROOT/fake-home" \
+    "$SOURCE_DIR/home/dot_config/landlock/agent-base.toml.tmpl" "$TEST_ROOT/$profile.toml" "$profile"
+  if grep -Fq '.hindsight' "$TEST_ROOT/$profile.sb" "$TEST_ROOT/$profile.toml"; then
+    printf 'FAIL: %s sandbox profile grants Hindsight access\n' "$profile" >&2
+    exit 1
+  fi
+done
+cmp "$TEST_ROOT/base.sb" "$TEST_ROOT/default.sb"
+cmp "$TEST_ROOT/base.toml" "$TEST_ROOT/default.toml"
 
 # Compare entire Hindsight allow blocks, so broad parent or config-write grants
 # cannot accidentally satisfy a mere substring check for the expected paths.
@@ -90,7 +108,7 @@ if grep -Eq '\.docker|\.config/gcloud|docker\.sock' "$TEST_ROOT/profile.toml"; t
   printf 'FAIL: default Landlock profile grants Docker/cloud credentials\n' >&2
   exit 1
 fi
-printf 'PASS: rendered config/log grants are narrow; default Docker/cloud boundaries retained\n'
+printf 'PASS: Hindsight grants are work-only and narrow; default Docker/cloud boundaries retained\n'
 
 # Mock only the Linux launcher, not filesystem enforcement. This runs on either
 # OS and proves preparation happens before llconfig, including standalone argv.
@@ -103,6 +121,7 @@ set -eu
 case "$EXPECT_LOGS" in
   present) test -d "$HOME/.hindsight/coding-agents-logs" ;;
   absent) test ! -e "$HOME/.hindsight" ;;
+  ignored) ;;
 esac
 SH
 chmod +x "$TEST_ROOT/bin/uname" "$MOCK_HOME/.local/bin/llconfig"
@@ -112,7 +131,7 @@ mock_run() {
   local expected="$1"
   shift
   HOME="$MOCK_HOME" PATH="$TEST_ROOT/bin:$PATH" EXPECT_LOGS="$expected" \
-    SAFE_AGENT_PROFILE="$TEST_ROOT/profile.toml" SAFE_AGENT_WORKDIR="$TEST_ROOT/work" \
+    SAFE_AGENT_PROFILE="${MOCK_PROFILE:-$TEST_ROOT/profile.toml}" SAFE_AGENT_WORKDIR="$TEST_ROOT/work" \
     SAFE_OPENCODE_ALLOW_ALL=0 SAFE_AGENT_ENABLE_DOCKER=0 bash "$WRAPPER" "$@"
 }
 
@@ -131,6 +150,9 @@ expect_unsafe_hindsight_paths() {
 }
 
 mock_run absent /bin/sh -c true
+for profile in base default; do
+  MOCK_PROFILE="$TEST_ROOT/$profile.toml" mock_run absent opencode --standalone
+done
 mock_run present opencode --standalone api get /api/info
 test ! -e "$MOCK_HOME/.hindsight/coding-agent.json"
 test "$(ls -ld "$MOCK_HOME/.hindsight" | cut -c1-10)" = drwx------
@@ -184,7 +206,15 @@ test ! -e "$TEST_ROOT/symlink-target/coding-agents-logs"
 rm "$MOCK_HOME/.hindsight"
 printf 'not-a-directory\n' > "$MOCK_HOME/.hindsight"
 expect_unsafe_hindsight_paths
-printf 'PASS: Linux OpenCode-only log preparation, absent config, preserved modes and all-command symlink rejection (mock launcher)\n'
+# Base must neither inspect nor alter leftover Hindsight state after work use.
+for profile in base default; do
+  MOCK_PROFILE="$TEST_ROOT/$profile.toml" mock_run ignored opencode --standalone
+  MOCK_PROFILE="$TEST_ROOT/$profile.toml" mock_run ignored /bin/sh -c true
+  grep -qx not-a-directory "$MOCK_HOME/.hindsight"
+done
+rm "$MOCK_HOME/.hindsight"
+MOCK_PROFILE="$TEST_ROOT/base.toml" mock_run absent opencode --standalone
+printf 'PASS: work-only Linux log preparation, absent config, preserved modes and all-command symlink rejection (mock launcher)\n'
 
 if [[ "$STATIC_ONLY" == 1 ]]; then
   printf 'SKIP: kernel sandbox checks (--static); rerun without --static outside an existing sandbox\n'
@@ -241,14 +271,18 @@ if [[ "$HOST_OS" == Linux ]]; then
   # executable-directory grant instead of adding a test-only permission.
   PROBE="$FAKE_HOME/.local/bin/opencode"
 fi
-render_profile "$PLATFORM" "$FAKE_HOME" "$PROFILE_SOURCE" "$TEST_ROOT/runtime-profile"
 
 # Give the probe the OpenCode basename so Linux must prepare the absent log dir.
 # It performs only filesystem operations; it never starts OpenCode or a server.
 cat > "$PROBE" <<'SH'
 #!/bin/sh
 set -eu
-grep -qx '{"apiUrl":"http://127.0.0.1:8888"}' "$HOME/.hindsight/coding-agent.json"
+if [ "$EXPECT_PROFILE" = work ]; then
+  grep -qx '{"apiUrl":"http://127.0.0.1:8888"}' "$HOME/.hindsight/coding-agent.json"
+elif cat "$HOME/.hindsight/coding-agent.json" >/dev/null 2>&1; then
+  printf 'FAIL: base can read Hindsight config\n' >&2
+  exit 1
+fi
 for path in .hindsight/private.txt .hindsight/coding-agents \
   .hindsight/coding-agents-logs-other/private.txt .docker/config.json \
   .docker/run/docker.sock .config/gcloud/credentials.db \
@@ -273,14 +307,23 @@ if mkdir "$HOME/.hindsight/new-directory" 2>/dev/null; then
   exit 1
 fi
 logs="$HOME/.hindsight/coding-agents-logs"
-mkdir -p "$logs"
-printf 'old\n' >> "$logs/plugin.log"
-mv "$logs/plugin.log" "$logs/plugin.log.1"
-printf 'current\n' >> "$logs/plugin.log"
-mv "$logs/plugin.log" "$logs/plugin.log.1"
-printf 'new\n' >> "$logs/plugin.log"
-grep -qx current "$logs/plugin.log.1"
-grep -qx new "$logs/plugin.log"
+if [ "$EXPECT_PROFILE" = work ]; then
+  mkdir -p "$logs"
+  printf 'old\n' >> "$logs/plugin.log"
+  mv "$logs/plugin.log" "$logs/plugin.log.1"
+  printf 'current\n' >> "$logs/plugin.log"
+  mv "$logs/plugin.log" "$logs/plugin.log.1"
+  printf 'new\n' >> "$logs/plugin.log"
+  grep -qx current "$logs/plugin.log.1"
+  grep -qx new "$logs/plugin.log"
+else
+  if cat "$logs/plugin.log" >/dev/null 2>&1 ||
+     (printf 'forbidden\n' > "$logs/base.log") 2>/dev/null ||
+     mkdir "$logs/base-directory" 2>/dev/null; then
+    printf 'FAIL: base can access Hindsight logs\n' >&2
+    exit 1
+  fi
+fi
 # Existing baseline project and runtime workdir grants must remain functional.
 printf 'baseline\n' > "$HOME/repos/baseline-file"
 grep -qx baseline "$HOME/repos/baseline-file"
@@ -288,12 +331,19 @@ printf 'workspace\n' > workspace-file
 grep -qx workspace workspace-file
 SH
 chmod +x "$PROBE"
-test ! -e "$FAKE_HOME/.hindsight/coding-agents-logs"
-(
-  cd "$WORKDIR"
-  HOME="$FAKE_HOME" PATH=/usr/bin:/bin:/usr/sbin:/sbin SAFE_AGENT_PROFILE="$TEST_ROOT/runtime-profile" \
-    SAFE_AGENT_WORKDIR="$WORKDIR" SAFE_AGENT_ENABLE_DOCKER=0 SAFE_OPENCODE_ALLOW_ALL=0 \
-    bash "$WRAPPER" "$PROBE" --standalone
-)
+# Base must deny both fresh and existing work state. The middle work run verifies
+# config reads and log rotation, including Linux's pre-sandbox directory creation.
+for profile in base work base; do
+  render_profile "$PLATFORM" "$FAKE_HOME" "$PROFILE_SOURCE" "$TEST_ROOT/runtime-profile" "$profile"
+  (
+    cd "$WORKDIR"
+    HOME="$FAKE_HOME" PATH=/usr/bin:/bin:/usr/sbin:/sbin SAFE_AGENT_PROFILE="$TEST_ROOT/runtime-profile" \
+      SAFE_AGENT_WORKDIR="$WORKDIR" SAFE_AGENT_ENABLE_DOCKER=0 SAFE_OPENCODE_ALLOW_ALL=0 \
+      EXPECT_PROFILE="$profile" bash "$WRAPPER" "$PROBE" --standalone
+  )
+  if [[ "$profile" == base && ! -e "$FAKE_HOME/.hindsight/coding-agents-logs/plugin.log" ]]; then
+    test ! -e "$FAKE_HOME/.hindsight/coding-agents-logs"
+  fi
+done
 grep -qx '{"apiUrl":"http://127.0.0.1:8888"}' "$FAKE_HOME/.hindsight/coding-agent.json"
-printf 'PASS: kernel sandbox config-read/config-write, sibling, log creation/rotation, Docker/cloud path and base/workdir boundaries\n'
+printf 'PASS: kernel base/work/base Hindsight isolation, config-read/config-write, sibling, log rotation and Docker/cloud/workdir boundaries\n'
